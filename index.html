@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cotton Mitra | Excellence in Agriculture</title>
+  <meta name="description" content="Discover the future of cotton farming with sustainable practices, high-quality production, and agricultural excellence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">Cotton<span>Mitra</span></a>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">The Crop</a></li>
+        <li><a href="#practices">Farming</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="/login" class="btn-login" style="padding: 0.5rem 1rem; border: 2px solid var(--primary-color); border-radius: 50px; margin-left: 1rem;">Login</a></li>
+      </ul>
+      <div class="mobile-menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </nav>
+
+  <header id="home" class="hero">
+    <div class="hero-content">
+      <div class="badge fade-in">Sustainable Agriculture</div>
+      <h1 class="slide-up">Cultivating the Future of <span class="text-highlight">Cotton</span></h1>
+      <p class="slide-up-delay">We combine generations of agricultural wisdom with modern, sustainable farming practices to produce the world's finest cotton responsibly.</p>
+      <div class="hero-buttons slide-up-delay-more">
+        <a href="#about" class="btn btn-primary">Discover More</a>
+        <a href="#contact" class="btn btn-secondary">Partner With Us</a>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+  </header>
+
+  <section id="about" class="section about-section">
+    <div class="container">
+      <div class="section-header text-center slide-in-bottom">
+        <h2>The White Gold</h2>
+        <p>Cotton is more than just a crop; it's the fabric of our lives. Learn about what makes our cotton exceptional.</p>
+      </div>
+
+      <div class="grid cards-grid">
+        <div class="card hover-lift">
+          <div class="card-icon">🌱</div>
+          <h3>Premium Seeds</h3>
+          <p>We start with the highest quality, non-GMO seeds chosen specifically for superior fiber length and strength.</p>
+        </div>
+        <div class="card hover-lift delay-1">
+          <div class="card-icon">💧</div>
+          <h3 class="card-title">Water Efficient</h3>
+          <p class="card-text">Our precision drip irrigation systems reduce water usage by up to 40% compared to traditional farming methods.</p>
+        </div>
+        <div class="card hover-lift delay-2">
+          <div class="card-icon">🌍</div>
+          <h3>Eco-Friendly</h3>
+          <p>We prioritize soil health through crop rotation and natural pest management, reducing reliance on harsh chemicals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="practices" class="section practices-section split-layout">
+    <div class="container split-container">
+      <div class="split-image slide-in-left">
+        <div class="image-wrapper">
+          <img src="cotton_farm.png" alt="A sustainable modern cotton farm at golden hour" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="split-content slide-in-right">
+        <h2>Smart Farming <br>For a Better Yield</h2>
+        <p>Our approach integrates cutting-edge agricultural technology with deep respect for the land.</p>
+        <ul class="feature-list">
+          <li>
+            <div class="feature-icon">✓</div>
+            <div class="feature-text">
+              <h4>Soil Analytics</h4>
+              <p>Real-time monitoring of soil nutrients and moisture levels.</p>
+            </div>
+          </li>
+          <li>
+            <div class="feature-icon">✓</div>
+            <div class="feature-text">
+              <h4>Automated Harvesting</h4>
+              <p>State-of-the-art machinery preserves fiber integrity during harvest.</p>
+            </div>
+          </li>
+          <li>
+            <div class="feature-icon">✓</div>
+            <div class="feature-text">
+              <h4>Climate Adaptation</h4>
+              <p>Resilient farming methods designed to adapt to changing weather patterns.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section stats-section text-center">
+    <div class="container">
+      <div class="grid stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Acres Farmed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Traceable</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">40%</div>
+          <div class="stat-label">Water Saved</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Generations</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section contact-section">
+    <div class="container contact-container">
+      <div class="contact-card">
+        <div class="contact-info">
+          <h2>Get in Touch</h2>
+          <p>Interested in our wholesale cotton, or want to learn more about our sustainable practices? Reach out to our team.</p>
+          <div class="contact-methods">
+            <p>📍 123 Agriculture Valley, Farmville</p>
+            <p>📧 contact@cottonmitra.com</p>
+            <p>📞 +1 (555) 123-4567</p>
+          </div>
+        </div>
+        <div class="contact-form-wrapper">
+          <form class="contact-form" onsubmit="event.preventDefault(); alert('Thank you for your message! We will get back to you soon.');">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" required placeholder="John Doe">
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" required placeholder="john@example.com">
+            </div>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" rows="4" required placeholder="How can we help you?"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary submit-btn">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 Cotton Mitra Agriculture. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

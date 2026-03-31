@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Cotton Mitra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Dashboard Specific Styles */
+    body {
+      background-color: var(--bg-color);
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden; /* Prevent body scroll, let content scroll */
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background-color: var(--primary-color);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-md);
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-header .logo {
+      font-size: 1.5rem;
+      color: var(--white);
+    }
+    
+    .sidebar-header .logo span {
+      color: var(--accent-color);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 2rem 0;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--white);
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .nav-icon {
+      font-size: 1.25rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .user-info h4 {
+      font-size: 0.9rem;
+      color: var(--white);
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .user-info p {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.6);
+      margin: 0;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: #F4F7F5; /* Slightly darker than bg-color for contrast with cards */
+    }
+
+    .top-header {
+      background-color: var(--white);
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--text-light);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .icon-btn:hover {
+      color: var(--primary-color);
+    }
+
+    .badge-dot {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      background-color: #E53935;
+      border-radius: 50%;
+      border: 2px solid var(--white);
+    }
+
+    /* Dashboard Grid (Inventory Overview specific) */
+    .dashboard-container {
+      padding: 2.5rem 3rem;
+      flex: 1;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      border: 1px solid rgba(0,0,0,0.03);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(76, 175, 80, 0.1);
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .stat-details h5 {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+    }
+
+    .stat-details h3 {
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    /* Chart / Main Area Container */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .panel {
+      background: var(--white);
+      border-radius: var(--border-radius-md);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .panel-title {
+      font-size: 1.25rem;
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    /* Chart Placeholder */
+    .chart-placeholder {
+      height: 300px;
+      width: 100%;
+      background: repeating-linear-gradient(45deg, #f9f9f9, #f9f9f9 10px, #ffffff 10px, #ffffff 20px);
+      border: 2px dashed #e0e0e0;
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    /* Alerts List */
+    .alerts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .alert-item {
+      padding: 1rem;
+      border-radius: var(--border-radius-sm);
+      background: #fdfdfd;
+      border-left: 4px solid var(--accent-color);
+      font-size: 0.95rem;
+    }
+
+    .alert-item.warning {
+      border-left-color: #FFA000;
+    }
+
+    .alert-item.danger {
+      border-left-color: #E53935;
+    }
+
+    .alert-item.info {
+      border-left-color: #2196F3;
+    }
+    
+    .alert-time {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .charts-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: -280px;
+        height: 100vh;
+      }
+      .sidebar.open {
+        left: 0;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="logo">Cotton<span>Mitra</span></a>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active">
+        <span class="nav-icon">📊</span>
+        <span>Inventory Overview</span>
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-icon">📦</span>
+        <span>Inventory</span>
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-icon">📈</span>
+        <span>Forecast</span>
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-icon">🤖</span>
+        <span>AI Chatbot</span>
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-icon">🔔</span>
+        <span>Alerts</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar" id="userAvatar">JD</div>
+        <div class="user-info">
+          <h4 id="userName">John Doe</h4>
+          <p id="userEmail">Farm Manager</p>
+        </div>
+      </div>
+      <a href="/api/logout" style="display: block; text-align: center; margin-top: 15px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Log Out</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="top-header">
+      <h2 class="page-title">Inventory Overview</h2>
+      <div class="header-actions">
+        <button class="icon-btn" title="Search">🔍</button>
+        <button class="icon-btn" title="Notifications">
+          🔔
+          <span class="badge-dot"></span>
+        </button>
+        <button class="icon-btn" title="Settings">⚙️</button>
+      </div>
+    </header>
+
+    <div class="dashboard-container">
+      
+      <!-- Statistics Row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(33, 150, 243, 0.1); color: #2196F3;">
+            📦
+          </div>
+          <div class="stat-details">
+            <h5>Total Bales Stored</h5>
+            <h3>4,250</h3>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(76, 175, 80, 0.1); color: var(--accent-color);">
+            ✨
+          </div>
+          <div class="stat-details">
+            <h5>Premium Grade</h5>
+            <h3>85%</h3>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(255, 160, 0, 0.1); color: #FFA000;">
+            🚚
+          </div>
+          <div class="stat-details">
+            <h5>Pending Shipments</h5>
+            <h3>12</h3>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(229, 57, 53, 0.1); color: #E53935;">
+            ⚠️
+          </div>
+          <div class="stat-details">
+            <h5>Low Stock Items</h5>
+            <h3>3</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts & Alerts Row -->
+      <div class="charts-row">
+        <!-- Main Chart Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Cotton Yield over Time</h3>
+            <select style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+              <option>Last 6 Months</option>
+              <option>This Year</option>
+              <option>All Time</option>
+            </select>
+          </div>
+          <div class="chart-placeholder">
+            [ Interactive Line Chart Visualization ]
+          </div>
+        </div>
+
+        <!-- Recent Alerts Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Recent Alerts</h3>
+            <a href="#" style="color: var(--accent-color); font-size: 0.9rem;">View All</a>
+          </div>
+          <div class="alerts-list">
+            <div class="alert-item danger">
+              Warehouse B humidity level exceeded 60%. Action required.
+              <span class="alert-time">10 mins ago</span>
+            </div>
+            <div class="alert-item warning">
+              Forecast update: Heavy rain expected next week. Protect exposed bales.
+              <span class="alert-time">2 hours ago</span>
+            </div>
+            <div class="alert-item info">
+              Shipment #4502 successfully loaded.
+              <span class="alert-time">4 hours ago</span>
+            </div>
+            <div class="alert-item">
+              AI Chatbot: Weekly inventory analysis report generated.
+              <span class="alert-time">Yesterday</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    // Fetch session and update UI
+    async function checkSession() {
+      try {
+        const response = await fetch('/api/session');
+        if (response.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
+        const data = await response.json();
+        if (response.ok && data.success && data.user) {
+          const u = data.user;
+          document.getElementById('userName').textContent = u.name || "Farmer";
+          document.getElementById('userEmail').textContent = u.email || "user@example.com";
+          if (u.picture) {
+            document.getElementById('userAvatar').innerHTML = `<img src="${u.picture}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            document.getElementById('userAvatar').style.backgroundColor = 'transparent';
+          } else {
+            document.getElementById('userAvatar').textContent = u.name ? u.name.charAt(0).toUpperCase() : u.email.charAt(0).toUpperCase();
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load session", err);
+      }
+    }
+
+    // Fetch stats from backend
+    async function loadDashboardStats() {
+      try {
+        const response = await fetch('/api/dashboard/stats');
+        const data = await response.json();
+        
+        // Update total bales
+        document.querySelector('.stat-card:nth-child(1) h3').textContent = data.total_bales.toLocaleString();
+        
+        // Update premium grade
+        document.querySelector('.stat-card:nth-child(2) h3').textContent = data.premium_grade + '%';
+        
+        // Update pending shipments
+        document.querySelector('.stat-card:nth-child(3) h3').textContent = data.pending_shipments;
+        
+        // Update low stock
+        document.querySelector('.stat-card:nth-child(4) h3').textContent = data.low_stock;
+        
+        // Update alerts
+        const alertsContainer = document.querySelector('.alerts-list');
+        alertsContainer.innerHTML = ''; // Clear default alerts
+        
+        data.alerts.forEach(alert => {
+          const alertDiv = document.createElement('div');
+          alertDiv.className = `alert-item ${alert.type === 'danger' ? 'danger' : alert.type === 'warning' ? 'warning' : 'info'}`;
+          alertDiv.innerHTML = `
+            ${alert.message}
+            <span class="alert-time">${alert.time}</span>
+          `;
+          alertsContainer.appendChild(alertDiv);
+        });
+        
+      } catch (err) {
+        console.error("Failed to load dashboard stats", err);
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      checkSession();
+      loadDashboardStats();
+    });
+  </script>
+</body>
+</html>

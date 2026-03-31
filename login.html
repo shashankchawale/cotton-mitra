@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Cotton Mitra</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Specific styles for the login page */
+    body {
+      background: var(--bg-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .login-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 2rem 4rem;
+      background: linear-gradient(135deg, #e8f3ee 0%, #f9f9f6 100%);
+      position: relative;
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url('cotton_farm.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      z-index: 0;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 450px;
+      padding: 3rem;
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      transform: translateY(20px);
+      opacity: 0;
+      animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .login-header h2 {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-form .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-form label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+
+    .auth-form input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: var(--border-radius-sm);
+      margin-top: 0.4rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      background-color: var(--white);
+    }
+
+    .auth-form input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+
+    .forgot-password {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .forgot-password a {
+      color: var(--accent-color);
+      font-weight: 500;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+
+    .login-btn-full {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.95rem;
+      color: var(--text-light);
+    }
+
+    .auth-footer a {
+      color: var(--accent-color);
+      font-weight: 600;
+      margin-left: 0.25rem;
+    }
+
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.9rem;
+      background-color: var(--white, #ffffff);
+      color: #333;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: var(--border-radius-sm, 8px);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 1.5rem;
+    }
+
+    .google-btn:hover {
+      background-color: #f9f9f9;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .google-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .google-btn img {
+      width: 22px;
+      height: 22px;
+      margin-right: 12px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--text-light, #666);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .divider:not(:empty)::before {
+      margin-right: .75em;
+    }
+
+    .divider:not(:empty)::after {
+      margin-left: .75em;
+    }
+
+    .auth-status {
+      min-height: 1.25rem;
+      margin: -0.5rem 0 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-light, #666);
+    }
+
+    .auth-status.error {
+      color: #b42318;
+    }
+
+    .auth-status.success {
+      color: #027a48;
+    }
+
+    /* Override navbar positioning just for login page */
+    .navbar { background: rgba(255,255,255,0.95); }
+    
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mock Google Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .google-modal {
+      background: #fff;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    }
+    .google-modal h3 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+    .google-modal p {
+      color: #5f6368;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .account-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .account-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      border: 1px solid #dadce0;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: left;
+    }
+    .account-item:hover {
+      background: #f8f9fa;
+    }
+    .account-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 1rem;
+    }
+    .account-details strong {
+      display: block;
+      font-size: 0.9rem;
+      color: #3c4043;
+    }
+    .account-details span {
+      display: block;
+      font-size: 0.8rem;
+      color: #5f6368;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Reusable Navigation -->
+  <nav class="navbar scrolled">
+    <div class="nav-container">
+      <a href="index.html" class="logo">Cotton<span>Mitra</span></a>
+    </div>
+  </nav>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h2>Welcome Back</h2>
+        <p>Access your Cotton Mitra dashboard</p>
+      </div>
+      
+      <button type="button" class="google-btn" onclick="mockGoogleLogin()">
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo">
+        Sign in with Google
+      </button>
+      <div id="googleStatus" class="auth-status" aria-live="polite"></div>
+      
+      <div class="divider">or sign in with email</div>
+
+      <form class="auth-form" id="loginForm">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" required placeholder="you@farmer.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required placeholder="••••••••">
+        </div>
+
+        <div class="forgot-password">
+          <label>
+            <input type="checkbox" style="width: auto; margin-right: 0.5rem; margin-top: 0;"> Remember me
+          </label>
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary login-btn-full">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="#">Create Account</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mock Google Modal HTML -->
+  <div class="modal-overlay" id="googleModal">
+    <div class="google-modal">
+      <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="40" style="margin-bottom: 1rem;" alt="Google Logo">
+      <h3>Choose an account</h3>
+      <p>to continue to Cotton Mitra (Simulation)</p>
+      
+      <div class="account-list">
+        <div class="account-item" onclick="selectMockAccount('MOCK_GOOGLE_TOKEN_1')">
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="account-avatar" alt="Avatar">
+          <div class="account-details">
+            <strong>Demo Farm Manager</strong>
+            <span>manager@cottonmitra.com</span>
+          </div>
+        </div>
+        <div class="account-item" onclick="selectMockAccount('MOCK_GOOGLE_TOKEN_2')">
+          <div class="account-avatar" style="background:#4CAF50;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;">S</div>
+          <div class="account-details">
+            <strong>Shashank</strong>
+            <span>shashank@farmer.com</span>
+          </div>
+        </div>
+        <div class="account-item" style="border:none; border-radius: 8px;" onclick="document.getElementById('googleModal').style.display='none'">
+          <div class="account-avatar" style="display:flex;align-items:center;justify-content:center;background:#f1f3f4;color:#5f6368;font-size:1.2rem;">×</div>
+          <div class="account-details">
+            <strong>Cancel</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const googleStatus = document.getElementById('googleStatus');
+
+    function setGoogleStatus(message, type = '') {
+      googleStatus.textContent = message;
+      googleStatus.className = `auth-status${type ? ` ${type}` : ''}`;
+    }
+
+    async function loadGoogleConfig() {
+      const response = await fetch('/api/config');
+      if (!response.ok) {
+        throw new Error('Could not load application config.');
+      }
+      return response.json();
+    }
+
+    function mockGoogleLogin() {
+      // Show the mock modal
+      document.getElementById('googleModal').style.display = 'flex';
+      setGoogleStatus('');
+    }
+
+    async function selectMockAccount(token) {
+      document.getElementById('googleModal').style.display = 'none';
+      try {
+        setGoogleStatus('Verifying Google credentials (Simulation Mode)...', '');
+        const apiResponse = await fetch('/api/login/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: token })
+        });
+
+        const data = await apiResponse.json();
+        if (!apiResponse.ok || !data.success) {
+          throw new Error(data.message || 'Google login failed.');
+        }
+
+        setGoogleStatus('Login successful. Redirecting...', 'success');
+        window.location.href = data.redirect;
+      } catch (err) {
+        console.error('Google Login Error:', err);
+        setGoogleStatus(err.message || 'Could not connect to the backend server.', 'error');
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      try {
+        // Submit credentials to the Python Backend
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          window.location.href = data.redirect;
+        } else {
+          alert("Login Failed: " + (data.message || 'Invalid credentials.'));
+        }
+      } catch (err) {
+        console.error("Login Error:", err);
+        // Fallback or error state
+        alert("Could not connect to the backend server. Make sure app.py is running!");
+      }
+    });
+
+  </script>
+</body>
+</html>
