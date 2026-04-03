@@ -1,0 +1,7 @@
+Flask==3.0.0
+google-auth==2.38.0
+python-dotenv==1.0.1
+pandas
+numpy
+scikit-learn
+flask-cors

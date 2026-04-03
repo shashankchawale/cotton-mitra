@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Cotton Mitra</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #1B4332;
+      --accent: #4CAF50;
+      --accent2: #81C784;
+      --bg: #F4F7F5;
+      --white: #fff;
+      --text: #1a1a2e;
+      --text-light: #6B7280;
+      --danger: #E53935;
+      --warning: #FFA000;
+      --info: #2196F3;
+      --success: #43A047;
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      display: flex;
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 260px;
+      background: var(--primary);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 1.5rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-logo span {
+      color: var(--accent);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.85rem 1.5rem;
+      color: rgba(255, 255, 255, 0.65);
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+    }
+
+    .nav-item.active {
+      background: rgba(76, 175, 80, 0.15);
+      color: #fff;
+      border-left-color: var(--accent);
+    }
+
+    .nav-icon {
+      font-size: 1.2rem;
+      width: 22px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 1.2rem 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .user-name {
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .user-role {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 0.78rem;
+    }
+
+    .logout-btn {
+      display: block;
+      text-align: center;
+      margin-top: 0.8rem;
+      padding: 0.5rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.07);
+      color: rgba(255, 255, 255, 0.65);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(229, 57, 53, 0.3);
+      color: #fff;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: 260px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .topbar-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .topbar-right {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .icon-btn {
+      background: none;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 0.45rem 0.7rem;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg);
+    }
+
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.6rem;
+      border-radius: 10px;
+      padding: 1px 5px;
+      font-weight: 700;
+    }
+
+    /* ── PAGES ── */
+    .page {
+      display: none;
+      padding: 2rem;
+      flex: 1;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ── STATS GRID ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* ── PANEL ── */
+    .panel {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.2rem;
+    }
+
+    @media(max-width:900px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── MINI CHART (SVG bars) ── */
+    .mini-chart {
+      width: 100%;
+      height: 180px;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(76, 175, 80, 0.04);
+    }
+
+    /* ── BADGES ── */
+    .chip {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .chip-green {
+      background: rgba(76, 175, 80, 0.12);
+      color: #2e7d32;
+    }
+
+    .chip-yellow {
+      background: rgba(255, 160, 0, 0.12);
+      color: #e65100;
+    }
+
+    .chip-red {
+      background: rgba(229, 57, 53, 0.12);
+      color: #c62828;
+    }
+
+    .chip-blue {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1565c0;
+    }
+
+    /* ── SEARCH/FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar input,
+    .filter-bar select {
+      padding: 0.6rem 1rem;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .filter-bar input:focus,
+    .filter-bar select:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #388e3c;
+    }
+
+    .btn-outline {
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    /* ── PAGINATION ── */
+    .pagination {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      justify-content: flex-end;
+    }
+
+    .page-btn {
+      padding: 0.4rem 0.8rem;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .page-btn.active,
+    .page-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ── ALERTS PAGE ── */
+    .alert-card {
+      padding: 1rem 1.2rem;
+      border-radius: 10px;
+      border-left: 4px solid var(--accent);
+      background: #fff;
+      box-shadow: var(--shadow);
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .alert-card.danger {
+      border-left-color: var(--danger);
+    }
+
+    .alert-card.warning {
+      border-left-color: var(--warning);
+    }
+
+    .alert-card.info {
+      border-left-color: var(--info);
+    }
+
+    .alert-card.success {
+      border-left-color: var(--success);
+    }
+
+    .alert-msg {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .alert-meta {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    .resolve-btn {
+      background: none;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      color: var(--text-light);
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .resolve-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ── CHATBOT ── */
+    .chat-wrap {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 200px);
+      min-height: 500px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: #F8FBF8;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      margin-bottom: 1rem;
+    }
+
+    .msg {
+      max-width: 75%;
+      padding: 0.85rem 1.1rem;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .msg.bot {
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .msg.user {
+      background: var(--primary);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      align-self: flex-end;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 0.85rem 1.1rem;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent);
+    }
+
+    .chat-send {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 1.4rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .chat-send:hover {
+      background: #388e3c;
+    }
+
+    .typing {
+      color: var(--text-light);
+      font-size: 0.82rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .quick-chip {
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      background: rgba(76, 175, 80, 0.07);
+      color: var(--primary);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-chip:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ── FORECAST ── */
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    @media(max-width:700px) {
+      .forecast-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .insight-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      text-align: center;
+    }
+
+    .insight-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .insight-label {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    .bar-chart-wrap {
+      overflow-x: auto;
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 200px;
+      padding: 0 4px;
+    }
+
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      gap: 4px;
+    }
+
+    .bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      transition: opacity 0.2s;
+      cursor: pointer;
+      min-width: 18px;
+    }
+
+    .bar:hover {
+      opacity: 0.75;
+    }
+
+    .bar-label {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 2rem;
+      width: 480px;
+      max-width: 95vw;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    .form-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 0.6rem 0.9rem;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--accent);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-light);
+    }
+
+    .empty-state .emoji {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Cotton<span>Mitra</span></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-page="overview" onclick="showPage('overview',this)">
+        <span class="nav-icon">📊</span><span>Overview</span>
+      </a>
+      <a class="nav-item" data-page="inventory" onclick="showPage('inventory',this)">
+        <span class="nav-icon">📦</span><span>Inventory</span>
+      </a>
+      <a class="nav-item" data-page="shipments" onclick="showPage('shipments',this)">
+        <span class="nav-icon">🚚</span><span>Shipments</span>
+      </a>
+      <a class="nav-item" data-page="forecast" onclick="showPage('forecast',this)">
+        <span class="nav-icon">📈</span><span>Forecast</span>
+      </a>
+      <a class="nav-item" data-page="chatbot" onclick="showPage('chatbot',this)">
+        <span class="nav-icon">🤖</span><span>AI Chatbot</span>
+      </a>
+      <a class="nav-item" data-page="aging" onclick="showPage('aging',this)">
+        <span class="nav-icon">⏳</span><span>Aging Alert</span>
+      </a>
+      <a class="nav-item" data-page="quality" onclick="showPage('quality',this)">
+        <span class="nav-icon">⭐</span><span>Quality Metrics</span>
+      </a>
+      <a class="nav-item" data-page="summary" onclick="showPage('summary',this)">
+        <span class="nav-icon">📋</span><span>Inventory Summary</span>
+      </a>
+      <a class="nav-item" data-page="alerts" onclick="showPage('alerts',this)">
+        <span class="nav-icon">🔔</span><span>Alerts <span id="alertBadge"
+            style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:0.72rem;margin-left:4px;display:none"></span></span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar" id="userAvatar">CM</div>
+        <div>
+          <div class="user-name" id="userName">Loading…</div>
+          <div class="user-role" id="userEmail">Farm Manager</div>
+        </div>
+      </div>
+      <a href="/api/logout" class="logout-btn">🚪 Log Out</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topbarTitle">Overview</div>
+      <div class="topbar-right">
+        <button class="icon-btn" onclick="showPage('alerts',document.querySelector('[data-page=alerts]'))"
+          title="Alerts">
+          🔔 <span class="badge" id="topBadge" style="display:none"></span>
+        </button>
+        <button class="icon-btn" title="Refresh" onclick="refreshCurrentPage()">🔄</button>
+      </div>
+    </header>
+
+    <!-- ═══════════════ PAGE: OVERVIEW ═══════════════ -->
+    <div class="page active" id="page-overview">
+      <div class="stats-grid" id="overviewStats">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(33,150,243,0.1);color:#2196F3">📦</div>
+          <div>
+            <div class="stat-label">Total Bales</div>
+            <div class="stat-value" id="s-bales">—</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(76,175,80,0.1);color:#4CAF50">✨</div>
+          <div>
+            <div class="stat-label">Premium Grade</div>
+            <div class="stat-value" id="s-premium">—</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,160,0,0.1);color:#FFA000">🚚</div>
+          <div>
+            <div class="stat-label">Pending Shipments</div>
+            <div class="stat-value" id="s-ships">—</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(229,57,53,0.1);color:#E53935">⚠️</div>
+          <div>
+            <div class="stat-label">Low Stock Items</div>
+            <div class="stat-value" id="s-low">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Monthly Yield (Bales)</div>
+          </div>
+          <div class="bar-chart-wrap">
+            <div class="bar-chart" id="yieldChart"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Recent Alerts</div><a href="#"
+              onclick="showPage('alerts',document.querySelector('[data-page=alerts]'));return false;"
+              style="color:var(--accent);font-size:0.85rem;text-decoration:none">View All →</a>
+          </div>
+          <div id="overviewAlerts"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PAGE: INVENTORY ═══════════════ -->
+    <div class="page" id="page-inventory">
+      <div class="filter-bar">
+        <input type="text" id="inv-search" placeholder="🔍  Search batch / location…" oninput="loadInventory()"
+          style="flex:1;min-width:180px">
+        <select id="inv-grade" onchange="loadInventory()">
+          <option value="">All Grades</option>
+          <option>Premium</option>
+          <option>Standard</option>
+          <option>Economy</option>
+        </select>
+        <select id="inv-status" onchange="loadInventory()">
+          <option value="">All Status</option>
+          <option>In Stock</option>
+          <option>Reserved</option>
+          <option>Low Stock</option>
+        </select>
+        <select id="inv-wh" onchange="loadInventory()">
+          <option value="">All Warehouses</option>
+          <option>Warehouse A</option>
+          <option>Warehouse B</option>
+          <option>Warehouse C</option>
+        </select>
+        <button class="btn btn-primary" onclick="openAddInventory()">＋ Add Batch</button>
+      </div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Batch ID</th>
+                <th>Grade</th>
+                <th>Bales</th>
+                <th>Warehouse</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Price/Bale</th>
+                <th>Humidity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invTable">
+              <tr>
+                <td colspan="9" style="text-align:center;padding:2rem;color:var(--text-light)">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="invPages"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PAGE: SHIPMENTS ═══════════════ -->
+    <div class="page" id="page-shipments">
+      <div class="filter-bar">
+        <select id="ship-status" onchange="loadShipments()">
+          <option value="">All Status</option>
+          <option>Pending</option>
+          <option>In Transit</option>
+          <option>Delivered</option>
+        </select>
+        <button class="btn btn-primary" onclick="openAddShipment()">＋ New Shipment</button>
+      </div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Shipment ID</th>
+                <th>Destination</th>
+                <th>Bales</th>
+                <th>Carrier</th>
+                <th>Scheduled</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="shipTable">
+              <tr>
+                <td colspan="7" style="text-align:center;padding:2rem;color:var(--text-light)">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PAGE: FORECAST ═══════════════ -->
+    <div class="page" id="page-forecast">
+
+      <!-- Error banner (hidden by default) -->
+      <div id="forecastError"
+        style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem;color:#856404;font-size:0.9rem">
+      </div>
+
+      <!-- Insight KPI cards -->
+      <div class="forecast-grid" id="forecastInsights"></div>
+
+      <!-- Trend box -->
+      <div id="forecastTrendBox"
+        style="display:none;padding:14px 18px;border-radius:10px;font-weight:700;text-align:center;margin-bottom:1.2rem;font-size:1rem">
+      </div>
+
+      <!-- Chart.js Line Chart panel -->
+      <div class="panel" style="margin-bottom:1.2rem">
+        <div class="panel-header">
+          <div class="panel-title">📈 Cotton Demand Forecast — Actual vs AI Prediction</div>
+          <span id="trendBadge" style="font-size:0.85rem;font-weight:600"></span>
+        </div>
+        <div style="position:relative;height:320px;padding:0.5rem 0">
+          <canvas id="forecastChart"></canvas>
+        </div>
+      </div>
+
+      <!-- AI Forecast detail table -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🤖 AI-Predicted Next 3 Months</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Type</th>
+                <th>Consumption (Lakh Bales)</th>
+                <th>vs Last Actual</th>
+              </tr>
+            </thead>
+            <tbody id="forecastTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════ PAGE: AI CHATBOT ═══════════════ -->
+    <div class="page" id="page-chatbot">
+      <div class="panel chat-wrap">
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg bot">👋 <strong>Hello! I'm Cotton Mitra AI.</strong>
+
+            I can help you with inventory levels, shipments, forecasts, alerts, warehouse conditions and more.
+
+            Ask me anything or use a quick question below!</div>
+        </div>
+        <div class="quick-chips" id="quickChips">
+          <span class="quick-chip" onclick="sendQuick('What is my total inventory?')">📦 Total Inventory</span>
+          <span class="quick-chip" onclick="sendQuick('Show low stock items')">⚠️ Low Stock</span>
+          <span class="quick-chip" onclick="sendQuick('How many shipments are pending?')">🚚 Pending Shipments</span>
+          <span class="quick-chip" onclick="sendQuick('What is the forecast?')">📈 Forecast</span>
+          <span class="quick-chip" onclick="sendQuick('Check warehouse humidity')">🏭 Warehouse Status</span>
+          <span class="quick-chip" onclick="sendQuick('What is the inventory value?')">💰 Inventory Value</span>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chatInput" placeholder="Ask me about your cotton operations…"
+            onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PAGE: ALERTS ═══════════════ -->
+    <div class="page" id="page-alerts">
+      <div class="filter-bar">
+        <select id="alert-type" onchange="loadAlerts()">
+          <option value="">All Types</option>
+          <option value="danger">🔴 Danger</option>
+          <option value="warning">🟡 Warning</option>
+          <option value="info">🔵 Info</option>
+          <option value="success">🟢 Success</option>
+        </select>
+        <select id="alert-resolved" onchange="loadAlerts()">
+          <option value="">All</option>
+          <option value="false">Unresolved</option>
+          <option value="true">Resolved</option>
+        </select>
+        <button class="btn btn-outline" onclick="resolveAll()">✅ Resolve All</button>
+      </div>
+      <div id="alertsList"></div>
+    </div>
+
+    <!-- ═══════════════ PAGE: AGING ALERT ═══════════════ -->
+    <div class="page" id="page-aging">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">⏳ Aging Risk Analysis (>90 Days)</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Batch ID</th>
+                <th>Warehouse</th>
+                <th>Bales</th>
+                <th>Age (Days)</th>
+                <th>Risk Level</th>
+              </tr>
+            </thead>
+            <tbody id="agingTable">
+              <tr>
+                <td colspan="5" style="text-align:center;padding:2rem;">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PAGE: QUALITY METRICS ═══════════════ -->
+    <div class="page" id="page-quality">
+      <div class="forecast-grid" id="qualityCards">
+        <!-- Cards populated by JS -->
+      </div>
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel-header">
+          <div class="panel-title">⭐ Quality Distribution</div>
+        </div>
+        <div class="bar-chart-wrap">
+          <div class="bar-chart" id="qualityChart" style="height:240px; justify-content: flex-start; gap: 40px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PAGE: INVENTORY SUMMARY ═══════════════ -->
+    <div class="page" id="page-summary">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📋 Comprehensive Inventory Report</div>
+        </div>
+        <div id="summaryContent" style="font-size: 1rem; line-height: 1.8;">
+          Loading summary...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══ MODAL: Add/Edit Inventory ═══ -->
+  <div class="modal-overlay" id="invModal">
+    <div class="modal">
+      <h3 id="invModalTitle">Add New Batch</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Batch ID*</label><input id="f-batchId" placeholder="BATCH-011"></div>
+        <div class="form-group"><label>Bales*</label><input type="number" id="f-bales" placeholder="500"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Grade</label><select id="f-grade">
+            <option>Premium</option>
+            <option>Standard</option>
+            <option>Economy</option>
+          </select></div>
+        <div class="form-group"><label>Status</label><select id="f-status">
+            <option>In Stock</option>
+            <option>Reserved</option>
+            <option>Low Stock</option>
+          </select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Warehouse</label><select id="f-warehouse">
+            <option>Warehouse A</option>
+            <option>Warehouse B</option>
+            <option>Warehouse C</option>
+          </select></div>
+        <div class="form-group"><label>Location</label><input id="f-location" placeholder="Section 1"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Price/Bale (₹)</label><input type="number" id="f-price" placeholder="1200"></div>
+        <div class="form-group"><label>Humidity (%)</label><input type="number" id="f-humidity" placeholder="55"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Arrival Date</label><input type="date" id="f-arrivalDate"></div>
+        <div class="form-group"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('invModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveInventory()">Save Batch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL: Add Shipment ═══ -->
+  <div class="modal-overlay" id="shipModal">
+    <div class="modal">
+      <h3>New Shipment</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Shipment ID</label><input id="fs-id" placeholder="SHIP-4509"></div>
+        <div class="form-group"><label>Bales</label><input type="number" id="fs-bales" placeholder="300"></div>
+      </div>
+      <div class="form-group"><label>Destination</label><input id="fs-dest" placeholder="Mumbai Textile Hub"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Carrier</label><input id="fs-carrier" value="AgriFreight Ltd"></div>
+        <div class="form-group"><label>Scheduled Date</label><input type="date" id="fs-date"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('shipModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveShipment()">Create Shipment</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── State ──
+    let currentPage = 'overview';
+    let invPage = 1;
+    let editingInvId = null;
+    let chatSessionId = 'sess-' + Date.now();
+
+    // ── Navigation ──
+    function showPage(name, el) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      if (el) el.classList.add('active');
+      currentPage = name;
+      const titles = { overview: 'Overview', inventory: 'Inventory Management', shipments: 'Shipments', forecast: 'Yield Forecast', chatbot: 'AI Chatbot', alerts: 'Alerts & Notifications', aging: 'Aging Risk Analysis', quality: 'Quality Metrics', summary: 'Inventory Summary' };
+      document.getElementById('topbarTitle').textContent = titles[name] || name;
+      refreshCurrentPage();
+    }
+
+    function refreshCurrentPage() {
+      if (currentPage === 'overview') loadOverview();
+      else if (currentPage === 'inventory') loadInventory();
+      else if (currentPage === 'shipments') loadShipments();
+      else if (currentPage === 'forecast') loadForecast();
+      else if (currentPage === 'alerts') loadAlerts();
+      else if (currentPage === 'aging') loadAging();
+      else if (currentPage === 'quality') loadQuality();
+      else if (currentPage === 'summary') loadSummary();
+    }
+
+    // ── OVERVIEW ──
+    async function loadOverview() {
+      try {
+        const r = await fetch('/api/dashboard/stats');
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+        document.getElementById('s-bales').textContent = d.total_bales.toLocaleString();
+        document.getElementById('s-premium').textContent = d.premium_grade + '%';
+        document.getElementById('s-ships').textContent = d.pending_shipments;
+        document.getElementById('s-low').textContent = d.low_stock;
+
+        // Yield chart
+        const chart = document.getElementById('yieldChart');
+        const max = Math.max(...d.yield_chart.map(y => y.bales));
+        chart.innerHTML = d.yield_chart.map(y => `
+      <div class="bar-group">
+        <div class="bar" style="height:${Math.round((y.bales / max) * 160)}px;background:var(--accent)" title="${y.month} ${y.year}: ${y.bales} bales"></div>
+        <div class="bar-label">${y.month}</div>
+      </div>`).join('');
+
+        // Alerts
+        const ac = document.getElementById('overviewAlerts');
+        if (!d.alerts || !d.alerts.length) { ac.innerHTML = '<div class="empty-state"><div class="emoji">✅</div><div>No active alerts</div></div>'; return; }
+        ac.innerHTML = d.alerts.slice(0, 4).map(a => `
+      <div class="alert-card ${a.type}" style="margin-bottom:0.6rem">
+        <div>
+          <div class="alert-msg">${a.message.substring(0, 90)}${a.message.length > 90 ? '…' : ''}</div>
+          <div class="alert-meta">${a.time}</div>
+        </div>
+      </div>`).join('');
+
+        // Badge
+        const cnt = d.alerts.filter(a => a).length;
+        updateBadge(cnt);
+      } catch (e) { console.error(e); }
+    }
+
+    function updateBadge(n) {
+      ['alertBadge', 'topBadge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (n > 0) { el.textContent = n; el.style.display = 'inline'; }
+        else el.style.display = 'none';
+      });
+    }
+
+    // ── INVENTORY ──
+    async function loadInventory() {
+      const s = document.getElementById('inv-search').value;
+      const g = document.getElementById('inv-grade').value;
+      const st = document.getElementById('inv-status').value;
+      const wh = document.getElementById('inv-wh').value;
+      const params = new URLSearchParams({ page: invPage, limit: 8, search: s, grade: g, status: st, warehouse: wh });
+      try {
+        const r = await fetch('/api/inventory?' + params);
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+        const tb = document.getElementById('invTable');
+        if (!d.data.length) {
+          tb.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="emoji">📦</div><div>No batches found</div></div></td></tr>';
+          document.getElementById('invPages').innerHTML = ''; return;
+        }
+        const gradeChip = g => g === 'Premium' ? 'chip-green' : g === 'Standard' ? 'chip-blue' : 'chip-yellow';
+        const statChip = s => s === 'In Stock' ? 'chip-green' : s === 'Reserved' ? 'chip-blue' : 'chip-red';
+        tb.innerHTML = d.data.map(i => `<tr>
+      <td><strong>${i.batchId}</strong></td>
+      <td><span class="chip ${gradeChip(i.grade)}">${i.grade}</span></td>
+      <td>${i.bales.toLocaleString()}</td>
+      <td>${i.warehouse}</td>
+      <td>${i.location}</td>
+      <td><span class="chip ${statChip(i.status)}">${i.status}</span></td>
+      <td>₹${i.pricePerBale.toLocaleString()}</td>
+      <td>${i.humidity}%</td>
+      <td>
+        <button class="btn btn-outline" style="padding:4px 10px;font-size:0.8rem;margin-right:4px" onclick="editInventory('${i._id}')">✏️</button>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:0.8rem" onclick="deleteInventory('${i._id}','${i.batchId}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+
+        // Pagination
+        const pages = document.getElementById('invPages');
+        pages.innerHTML = '';
+        for (let p = 1; p <= d.pages; p++) {
+          const b = document.createElement('button');
+          b.className = 'page-btn' + (p === invPage ? ' active' : '');
+          b.textContent = p;
+          b.onclick = () => { invPage = p; loadInventory(); };
+          pages.appendChild(b);
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function openAddInventory() {
+      editingInvId = null;
+      document.getElementById('invModalTitle').textContent = 'Add New Batch';
+      ['f-batchId', 'f-bales', 'f-location', 'f-price', 'f-humidity'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-grade').value = 'Premium';
+      document.getElementById('f-status').value = 'In Stock';
+      document.getElementById('f-warehouse').value = 'Warehouse A';
+      document.getElementById('f-arrivalDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('invModal').classList.add('open');
+    }
+
+    async function editInventory(id) {
+      const r = await fetch('/api/inventory');
+      const d = await r.json();
+      const item = d.data.find(i => i._id === id);
+      if (!item) return;
+      editingInvId = id;
+      document.getElementById('invModalTitle').textContent = 'Edit Batch';
+      document.getElementById('f-batchId').value = item.batchId;
+      document.getElementById('f-bales').value = item.bales;
+      document.getElementById('f-grade').value = item.grade;
+      document.getElementById('f-status').value = item.status;
+      document.getElementById('f-warehouse').value = item.warehouse;
+      document.getElementById('f-location').value = item.location;
+      document.getElementById('f-price').value = item.pricePerBale;
+      document.getElementById('f-humidity').value = item.humidity;
+      document.getElementById('f-arrivalDate').value = item.arrival_date || '';
+      document.getElementById('invModal').classList.add('open');
+    }
+
+    async function saveInventory() {
+      const body = {
+        batchId: document.getElementById('f-batchId').value,
+        bales: document.getElementById('f-bales').value,
+        grade: document.getElementById('f-grade').value,
+        status: document.getElementById('f-status').value,
+        warehouse: document.getElementById('f-warehouse').value,
+        location: document.getElementById('f-location').value,
+        pricePerBale: document.getElementById('f-price').value,
+        humidity: document.getElementById('f-humidity').value,
+        arrival_date: document.getElementById('f-arrivalDate').value,
+      };
+      if (!body.batchId || !body.bales) { alert('Batch ID and Bales are required.'); return; }
+      const url = editingInvId ? `/api/inventory/${editingInvId}` : '/api/inventory';
+      const method = editingInvId ? 'PUT' : 'POST';
+      const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const d = await r.json();
+      if (d.success) { closeModal('invModal'); loadInventory(); }
+      else alert(d.message || 'Error saving batch.');
+    }
+
+    async function deleteInventory(id, name) {
+      if (!confirm(`Delete batch ${name}?`)) return;
+      const r = await fetch(`/api/inventory/${id}`, { method: 'DELETE' });
+      const d = await r.json();
+      if (d.success) loadInventory();
+      else alert(d.message || 'Error deleting batch.');
+    }
+
+    // ── SHIPMENTS ──
+    async function loadShipments() {
+      const st = document.getElementById('ship-status').value;
+      const params = st ? '?status=' + st : '';
+      try {
+        const r = await fetch('/api/shipments' + params);
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+        const tb = document.getElementById('shipTable');
+        if (!d.data.length) {
+          tb.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="emoji">🚚</div><div>No shipments found</div></div></td></tr>'; return;
+        }
+        const statChip = s => s === 'Delivered' ? 'chip-green' : s === 'In Transit' ? 'chip-blue' : 'chip-yellow';
+        tb.innerHTML = d.data.map(s => `<tr>
+      <td><strong>${s.shipmentId}</strong></td>
+      <td>${s.destination}</td>
+      <td>${s.bales.toLocaleString()}</td>
+      <td>${s.carrier}</td>
+      <td>${s.scheduledDate}</td>
+      <td><span class="chip ${statChip(s.status)}">${s.status}</span></td>
+      <td>
+        ${s.status !== 'Delivered' ? `<button class="btn btn-outline" style="padding:4px 10px;font-size:0.8rem" onclick="markDelivered('${s._id}')">✅ Deliver</button>` : '<span style="color:var(--text-light);font-size:0.85rem">Done</span>'}
+      </td>
+    </tr>`).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    function openAddShipment() {
+      document.getElementById('shipModal').classList.add('open');
+    }
+    async function saveShipment() {
+      const body = {
+        shipmentId: document.getElementById('fs-id').value || 'SHIP-' + Date.now(),
+        destination: document.getElementById('fs-dest').value,
+        bales: document.getElementById('fs-bales').value || 0,
+        carrier: document.getElementById('fs-carrier').value,
+        scheduledDate: document.getElementById('fs-date').value,
+        status: 'Pending'
+      };
+      const r = await fetch('/api/shipments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const d = await r.json();
+      if (d.success) { closeModal('shipModal'); loadShipments(); }
+      else alert(d.message || 'Error creating shipment.');
+    }
+    async function markDelivered(id) {
+      const r = await fetch(`/api/shipments/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Delivered' }) });
+      const d = await r.json();
+      if (d.success) loadShipments();
+    }
+
+    // ── FORECAST ──
+    let forecastChartInstance = null; // Track Chart.js instance to destroy before re-render
+
+    async function loadForecast() {
+      const errBanner = document.getElementById('forecastError');
+      const trendBox = document.getElementById('forecastTrendBox');
+      errBanner.style.display = 'none';
+      trendBox.style.display = 'none';
+      document.getElementById('forecastInsights').innerHTML = '<div style="color:var(--text-light);padding:1rem">⏳ Running ML model…</div>';
+      document.getElementById('forecastTable').innerHTML = '';
+
+      try {
+        const r = await fetch('/api/forecast');
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+
+        if (!d.success) {
+          errBanner.textContent = '⚠️ ' + (d.message || 'ML forecast unavailable. Make sure scikit-learn & pandas are installed.');
+          errBanner.style.display = 'block';
+          document.getElementById('forecastInsights').innerHTML = '';
+          return;
+        }
+
+        const ins = d.insights;
+        const history = d.history;   // last 3 actual months
+        const forecast = d.forecast;  // next 3 predicted months
+        const all = d.results;   // all 6 combined
+
+        // ── Insight KPI cards ──
+        const trendIcon = ins.trend === 'upward' ? '📈' : ins.trend === 'downward' ? '📉' : '➡️';
+        const trendColor = ins.trend === 'upward' ? '#388e3c' : ins.trend === 'downward' ? '#c62828' : '#e65100';
+
+        document.getElementById('forecastInsights').innerHTML = `
+      <div class="insight-card">
+        <div class="insight-val">${ins.avgActual}</div>
+        <div class="insight-label">Avg Actual Consumption<br>(lakh bales, last 3 months)</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-val">${ins.totalProjected}</div>
+        <div class="insight-label">Total AI Projected<br>(next 3 months, lakh bales)</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-val" style="color:${trendColor};font-size:1.5rem">${trendIcon} ${ins.trend.charAt(0).toUpperCase() + ins.trend.slice(1)}</div>
+        <div class="insight-label">Forecast Trend<br>(${ins.trendVal > 0 ? '+' : ''}${ins.trendVal} lakh bales)</div>
+      </div>`;
+
+        // ── Trend badge & trend box (mirrors forcast/templates/forecast.html) ──
+        document.getElementById('trendBadge').innerHTML = `<span style="color:${trendColor}">${trendIcon} ${ins.trend}</span>`;
+
+        if (ins.trendVal > 0) {
+          trendBox.style.cssText = 'display:block;padding:14px 18px;border-radius:10px;font-weight:700;text-align:center;margin-bottom:1.2rem;font-size:1rem;background:#d4edda;color:#155724;border:1px solid #c3e6cb';
+          trendBox.textContent = `📈 Demand expected to INCREASE by ${ins.trendVal} Lakh Bales`;
+        } else if (ins.trendVal < 0) {
+          trendBox.style.cssText = 'display:block;padding:14px 18px;border-radius:10px;font-weight:700;text-align:center;margin-bottom:1.2rem;font-size:1rem;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb';
+          trendBox.textContent = `📉 Demand expected to DECREASE by ${Math.abs(ins.trendVal)} Lakh Bales`;
+        } else {
+          trendBox.style.cssText = 'display:block;padding:14px 18px;border-radius:10px;font-weight:700;text-align:center;margin-bottom:1.2rem;font-size:1rem;background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb';
+          trendBox.textContent = 'Demand expected to remain stable';
+        }
+
+        // ── Chart.js Line Chart (same logic as forcast/templates/forecast.html) ──
+        // Prepare labels and datasets
+        const labels = all.map(item => item.month);
+
+        // Actual values: only for 'Actual' type entries
+        const actualValues = all.map(item => item.type === 'Actual' ? item.value : null);
+
+        // Forecast values: includes the bridge point (last Actual) so lines connect
+        const forecastValues = all.map((item, i) => {
+          if (item.type === 'Forecast') return item.value;
+          // Bridge: last actual point → connect to first forecast
+          if (item.type === 'Actual' && all[i + 1] && all[i + 1].type === 'Forecast') {
+            return item.value;
+          }
+          return null;
+        });
+
+        // Destroy previous chart if exists (prevent canvas reuse error)
+        if (forecastChartInstance) { forecastChartInstance.destroy(); forecastChartInstance = null; }
+
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        forecastChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Actual Demand',
+                data: actualValues,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.08)',
+                borderWidth: 3,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                fill: false,
+                tension: 0.3,
+                spanGaps: false
+              },
+              {
+                label: 'AI Predicted Demand',
+                data: forecastValues,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.08)',
+                borderWidth: 3,
+                borderDash: [6, 4],
+                pointRadius: 5,
+                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                fill: false,
+                tension: 0.3,
+                spanGaps: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: true, position: 'top' },
+              tooltip: {
+                callbacks: {
+                  label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} Lakh Bales`
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                title: { display: true, text: 'Consumption (Lakh Bales)', font: { size: 12 } },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+              },
+              x: {
+                grid: { display: false }
+              }
+            }
+          }
+        });
+
+        // ── AI Forecast detail table ──
+        const lastActual = history.length ? history[history.length - 1].value : 0;
+        document.getElementById('forecastTable').innerHTML = forecast.map(f => {
+          const diff = (f.value - lastActual).toFixed(2);
+          const diffColor = diff >= 0 ? '#388e3c' : '#c62828';
+          return `<tr>
+        <td><strong>${f.month}</strong></td>
+        <td><span class="chip chip-blue">🤖 AI Forecast</span></td>
+        <td><span style="font-weight:700;font-size:1rem">${f.value}</span> lakh bales</td>
+        <td><span style="color:${diffColor};font-weight:600">${diff >= 0 ? '+' : ''}${diff}</span> vs last actual</td>
+      </tr>`;
+        }).join('');
+
+      } catch (e) {
+        errBanner.textContent = '❌ Failed to load forecast: ' + e.message;
+        errBanner.style.display = 'block';
+        document.getElementById('forecastInsights').innerHTML = '';
+        console.error(e);
+      }
+    }
+
+    // ── ALERTS ──
+    async function loadAlerts() {
+      const type = document.getElementById('alert-type').value;
+      const resolved = document.getElementById('alert-resolved').value;
+      const params = new URLSearchParams();
+      if (type) params.set('type', type);
+      if (resolved !== '') params.set('resolved', resolved);
+      try {
+        const r = await fetch('/api/alerts?' + params);
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+        updateBadge(d.unreadCount);
+        const list = document.getElementById('alertsList');
+        if (!d.data.length) { list.innerHTML = '<div class="empty-state"><div class="emoji">✅</div><div>No alerts to show</div></div>'; return; }
+        list.innerHTML = d.data.map(a => `
+      <div class="alert-card ${a.type}" id="alert-${a._id}">
+        <div>
+          <div class="alert-msg">${a.message}</div>
+          <div class="alert-meta">📌 ${a.source} &nbsp;·&nbsp; ${a.timeAgo} &nbsp;·&nbsp; ${a.resolved ? '<span style="color:var(--success)">Resolved</span>' : '<span style="color:var(--warning)">Unresolved</span>'}</div>
+        </div>
+        ${!a.resolved ? `<button class="resolve-btn" onclick="resolveAlert('${a._id}')">Resolve</button>` : ''}
+      </div>`).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function resolveAlert(id) {
+      const r = await fetch(`/api/alerts/${id}/resolve`, { method: 'PUT' });
+      const d = await r.json();
+      if (d.success) loadAlerts();
+    }
+    async function resolveAll() {
+      if (!confirm('Resolve all alerts?')) return;
+      const r = await fetch('/api/alerts/resolve-all', { method: 'PUT' });
+      const d = await r.json();
+      if (d.success) loadAlerts();
+    }
+
+    // ── MISSING PAGES (AGING, QUALITY, SUMMARY) ──
+    async function loadAging() {
+      try {
+        const r = await fetch('/api/inventory/aging');
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+        const tb = document.getElementById('agingTable');
+        if (!d.data || d.data.length === 0) {
+          tb.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="emoji">✅</div><div>No aging risk detected. All cotton lots are within safe storage duration.</div></div></td></tr>';
+          return;
+        }
+        tb.innerHTML = d.data.map(i => `<tr>
+          <td><strong>${i.batchId}</strong></td>
+          <td>${i.warehouse}</td>
+          <td>${i.bales.toLocaleString()}</td>
+          <td style="color:var(--danger);font-weight:bold;">${i.age_days} Days</td>
+          <td><span class="chip chip-red">High Risk</span></td>
+        </tr>`).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadQuality() {
+      try {
+        const r = await fetch('/api/inventory/quality');
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+
+        const total = d.data.A + d.data.B + d.data.C || 1;
+        const hA = Math.max((d.data.A / total) * 200, 4);
+        const hB = Math.max((d.data.B / total) * 200, 4);
+        const hC = Math.max((d.data.C / total) * 200, 4);
+
+        document.getElementById('qualityCards').innerHTML = `
+          <div class="insight-card">
+            <div class="insight-val" style="color:#388e3c;">${d.data.A}</div>
+            <div class="insight-label">Grade A (Premium) Lots</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-val" style="color:#1565c0;">${d.data.B}</div>
+            <div class="insight-label">Grade B (Standard) Lots</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-val" style="color:#e65100;">${d.data.C}</div>
+            <div class="insight-label">Grade C (Economy) Lots</div>
+          </div>
+        `;
+
+        document.getElementById('qualityChart').innerHTML = `
+          <div class="bar-group">
+            <div class="bar" style="height:${hA}px;background:#388e3c;width:60px;" title="Premium: ${d.data.A}"></div>
+            <div class="bar-label">Grade A</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height:${hB}px;background:#1565c0;width:60px;" title="Standard: ${d.data.B}"></div>
+            <div class="bar-label">Grade B</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height:${hC}px;background:#e65100;width:60px;" title="Economy: ${d.data.C}"></div>
+            <div class="bar-label">Grade C</div>
+          </div>
+        `;
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadSummary() {
+      try {
+        const r = await fetch('/api/inventory/summary');
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+        document.getElementById('summaryContent').innerHTML = `
+          <ul style="list-style:none; padding:10px 20px;">
+            <li style="margin-bottom:10px;"><strong>Total Stock:</strong> ${d.data.total_stock.toLocaleString()} MT</li>
+            <li style="margin-bottom:10px;"><strong>Aging Lots (>90 days):</strong> ${d.data.aging_lots}</li>
+            <li style="margin-bottom:10px;"><strong>Forecast Demand:</strong> ${d.data.forecast_demand.toFixed(2)} MT</li>
+            <li style="margin-bottom:10px;">
+               <strong>Quality Breakdown:</strong>
+               <ul style="padding-left:15px; margin-top:5px; color:var(--text-light);">
+                 <li>Grade A: ${d.data.quality.A} lots</li>
+                 <li>Grade B: ${d.data.quality.B} lots</li>
+                 <li>Grade C: ${d.data.quality.C} lots</li>
+               </ul>
+            </li>
+          </ul>
+        `;
+      } catch (e) { console.error(e); }
+    }
+
+    // ── CHATBOT ──
+    async function sendChat() {
+      const input = document.getElementById('chatInput');
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = '';
+      appendMsg(msg, 'user');
+      const typing = appendMsg('…typing', 'bot');
+      try {
+        const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg, sessionId: chatSessionId }) });
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+        typing.remove();
+        if (d.success) appendMsg(d.reply, 'bot');
+        else appendMsg('Sorry, something went wrong. Please try again.', 'bot');
+      } catch (e) {
+        typing.remove();
+        appendMsg('Connection error. Make sure the server is running.', 'bot');
+      }
+    }
+
+    function sendQuick(msg) {
+      document.getElementById('chatInput').value = msg;
+      sendChat();
+    }
+
+    function appendMsg(text, who) {
+      const box = document.getElementById('chatMessages');
+      const el = document.createElement('div');
+      el.className = 'msg ' + who;
+      el.textContent = text;
+      box.appendChild(el);
+      box.scrollTop = box.scrollHeight;
+      return el;
+    }
+
+    // ── MODALS ──
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+      m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+    });
+
+    // ── SESSION CHECK ──
+    async function checkSession() {
+      try {
+        const r = await fetch('/api/session');
+        if (r.status === 401) { location.href = '/login'; return; }
+        const d = await r.json();
+        if (d.success && d.user) {
+          const u = d.user;
+          document.getElementById('userName').textContent = u.name || 'Manager';
+          document.getElementById('userEmail').textContent = u.email || '';
+          document.getElementById('userAvatar').textContent = (u.name || u.email || 'C').charAt(0).toUpperCase();
+        }
+      } catch (e) { }
+    }
+
+    // ── INIT ──
+    document.addEventListener('DOMContentLoaded', () => {
+      checkSession();
+      loadOverview();
+    });
+  </script>
+</body>
+
+</html>
