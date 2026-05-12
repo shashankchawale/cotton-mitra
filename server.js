@@ -790,8 +790,12 @@ function timeAgo(date) {
 }
 
 // ─── Start Server ─────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n🚀 Cotton Mitra Server running on http://localhost:${PORT}`);
-  console.log(`📊 Dashboard: http://localhost:${PORT}/dashboard`);
-  console.log(`🔑 Login:     http://localhost:${PORT}/login\n`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Cotton Mitra Server running on http://localhost:${PORT}`);
+    console.log(`📊 Dashboard: http://localhost:${PORT}/dashboard`);
+    console.log(`🔑 Login:     http://localhost:${PORT}/login\n`);
+  });
+}
+
+module.exports = app;
