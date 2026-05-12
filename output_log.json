@@ -1,0 +1,35 @@
+[
+  [
+    {
+      "month": "Feb 2026",
+      "value": 25.16,
+      "type": "Actual"
+    },
+    {
+      "month": "Mar 2026",
+      "value": 24.87,
+      "type": "Actual"
+    },
+    {
+      "month": "Apr 2026",
+      "value": 25.36,
+      "type": "Actual"
+    },
+    {
+      "month": "May 2026",
+      "value": 25.22,
+      "type": "Forecast"
+    },
+    {
+      "month": "Jun 2026",
+      "value": 25.19,
+      "type": "Forecast"
+    },
+    {
+      "month": "Jul 2026",
+      "value": 25.2,
+      "type": "Forecast"
+    }
+  ],
+  -0.16
+]

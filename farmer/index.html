@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotton Mitra - किसान का साथी</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a7a3c;
+    --green-light: #2ea94f;
+    --green-dark: #0f4e24;
+    --gold: #e8a020;
+    --gold-light: #f5c842;
+    --cream: #fdf8ee;
+    --brown: #5c3d1e;
+    --white: #ffffff;
+    --shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f4e24 0%, #1a7a3c 40%, #0d6b3a 70%, #1a4a0f 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .landing-container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .logo-area {
+    margin-bottom: 32px;
+    animation: fadeInDown 0.8s ease;
+  }
+  .logo-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #f5c842, #e8a020);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 32px rgba(232,160,32,0.4), 0 0 0 8px rgba(245,200,66,0.2);
+    animation: pulse 3s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 8px 32px rgba(232,160,32,0.4), 0 0 0 8px rgba(245,200,66,0.2); }
+    50% { box-shadow: 0 8px 40px rgba(232,160,32,0.6), 0 0 0 16px rgba(245,200,66,0.1); }
+  }
+  .brand-name {
+    font-family: 'Baloo 2', cursive;
+    font-size: 56px;
+    font-weight: 800;
+    color: #f5c842;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .brand-tagline {
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+    margin-top: 8px;
+    font-weight: 300;
+    letter-spacing: 2px;
+  }
+
+  .hero-text {
+    animation: fadeInUp 0.8s 0.2s both;
+    margin-bottom: 40px;
+  }
+  .hero-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .hero-subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .features-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeInUp 0.8s 0.4s both;
+  }
+  .feature-chip {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    padding: 8px 18px;
+    color: white;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 400;
+  }
+  .feature-chip span { font-size: 16px; }
+
+  .enter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #f5c842, #e8a020);
+    color: #0f4e24;
+    font-family: 'Baloo 2', cursive;
+    font-size: 24px;
+    font-weight: 700;
+    padding: 20px 48px;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(232,160,32,0.4);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.8s 0.6s both;
+    letter-spacing: 0.5px;
+  }
+  .enter-btn:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 16px 48px rgba(232,160,32,0.5);
+  }
+  .enter-btn .btn-icon { font-size: 28px; }
+
+  .stats-row {
+    display: flex;
+    gap: 32px;
+    margin-top: 56px;
+    animation: fadeInUp 0.8s 0.8s both;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Baloo 2', cursive;
+    font-size: 32px;
+    font-weight: 700;
+    color: #f5c842;
+  }
+  .stat-lbl {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .stat-div {
+    width: 1px;
+    background: rgba(255,255,255,0.2);
+    height: 40px;
+    align-self: center;
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Floating cotton boll decorations */
+  .floater {
+    position: fixed;
+    font-size: 24px;
+    opacity: 0.08;
+    animation: float linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.08; }
+    90% { opacity: 0.08; }
+    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="floater" style="left: 5%; animation-duration: 15s; animation-delay: 0s; font-size: 32px;">🌿</div>
+<div class="floater" style="left: 15%; animation-duration: 20s; animation-delay: 3s;">☁️</div>
+<div class="floater" style="left: 30%; animation-duration: 18s; animation-delay: 6s; font-size: 20px;">🌾</div>
+<div class="floater" style="left: 60%; animation-duration: 22s; animation-delay: 2s;">🌿</div>
+<div class="floater" style="left: 75%; animation-duration: 16s; animation-delay: 8s; font-size: 28px;">🌾</div>
+<div class="floater" style="left: 90%; animation-duration: 19s; animation-delay: 4s;">☁️</div>
+
+<div class="landing-container">
+  <div class="logo-area">
+    <div class="logo-icon">🌾</div>
+    <div class="brand-name">Cotton Mitra</div>
+    <div class="brand-tagline">किसान का डिजिटल साथी • Digital Farmer Companion</div>
+  </div>
+
+  <div class="hero-text">
+    <div class="hero-title">महाराष्ट्रातील शेतकऱ्यांसाठी<br>The Complete Farmer Platform</div>
+    <div class="hero-subtitle">Real-time cotton prices, government schemes, warehouse locations, AI assistant & more — all in one place</div>
+  </div>
+
+
+  <a href="/farmer/dashboard" class="enter-btn">
+    <span class="btn-icon">🚜</span>
+    Farmer's Dashboard 
+  </a>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-num">350+</div>
+      <div class="stat-lbl">APMC Markets</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-num">36</div>
+      <div class="stat-lbl">Districts</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-num">24/7</div>
+      <div class="stat-lbl">AI Support</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-num">Free</div>
+      <div class="stat-lbl">For Farmers</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

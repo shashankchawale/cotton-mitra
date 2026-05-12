@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotton Mitra - Farmer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --green: #1a7a3c;
+
+  
+  --green-light: #2ea94f;
+  --green-dark: #0f4e24;
+  --gold: #e8a020;
+  --gold-light: #f5c842;
+  --cream: #fdf8ee;
+  --brown: #5c3d1e;
+  --white: #ffffff;
+  --bg: #f0f7f2;
+  --card: #ffffff;
+  --text: #1a2e1e;
+  --text-muted: #5a7a5e;
+  --border: #d4e8d8;
+  --shadow: 0 4px 20px rgba(26,122,60,0.1);
+  --shadow-lg: 0 8px 40px rgba(26,122,60,0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #0f4e24, #1a7a3c);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  gap: 16px;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.header-logo .icon { font-size: 28px; }
+.header-logo .name {
+  font-family: 'Baloo 2', cursive;
+  font-size: 22px;
+  font-weight: 700;
+  color: #f5c842;
+}
+.header-logo .sub { font-size: 11px; color: rgba(255,255,255,0.6); display: block; line-height: 1; }
+
+.lang-selector {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50px;
+  padding: 4px;
+}
+.lang-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  transition: all 0.2s;
+  font-family: 'Poppins', sans-serif;
+}
+.lang-btn.active {
+  background: #f5c842;
+  color: #0f4e24;
+  font-weight: 600;
+}
+.lang-btn:hover:not(.active) { color: white; background: rgba(255,255,255,0.15); }
+
+.date-badge {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  padding: 6px 16px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* MAIN LAYOUT */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+}
+
+/* NAV TABS */
+.nav-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 50px;
+  border: 2px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.nav-tab.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.nav-tab:hover:not(.active) {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(26,122,60,0.05);
+}
+.nav-tab .tab-icon { font-size: 18px; }
+
+/* SECTIONS */
+.section { display: none; }
+.section.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(26,122,60,0.05), rgba(26,122,60,0.02));
+}
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--green-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-body { padding: 20px; }
+
+/* GRID LAYOUTS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 900px) {
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* PRICE HERO */
+.price-hero {
+  background: linear-gradient(135deg, #0f4e24, #1a7a3c, #0d6b3a);
+  border-radius: var(--radius);
+  padding: 28px;
+  color: white;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.price-hero::before {
+  content: '🌾';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 80px;
+  opacity: 0.12;
+}
+.price-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 600px) { .price-hero-grid { grid-template-columns: 1fr; } }
+.price-box { text-align: center; }
+.price-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.price-value {
+  font-family: 'Baloo 2', cursive;
+  font-size: 36px;
+  font-weight: 700;
+  color: #f5c842;
+  line-height: 1;
+}
+.price-unit {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  margin-top: 2px;
+}
+.price-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 50px;
+  margin-top: 6px;
+  font-weight: 600;
+}
+.price-change.up { background: rgba(46,169,79,0.25); color: #7fd89a; }
+.price-change.down { background: rgba(220,60,60,0.25); color: #ff9090; }
+.price-change.neutral { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
+
+/* DISTRICT SELECTOR */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.filter-bar select, .filter-bar input {
+  padding: 10px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: white;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.filter-bar select:focus, .filter-bar input:focus { border-color: var(--green); }
+
+/* PRICE TABLE */
+.price-table-wrap { overflow-x: auto; }
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.price-table th {
+  background: linear-gradient(135deg, #0f4e24, #1a7a3c);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+}
+.price-table th:first-child { border-radius: 8px 0 0 0; }
+.price-table th:last-child { border-radius: 0 8px 0 0; }
+.price-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.price-table tr:hover td { background: rgba(26,122,60,0.04); }
+.price-tag {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--green-dark);
+}
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: #e3f7e9; color: #1a7a3c; }
+.badge-amber { background: #fef3e2; color: #b87a00; }
+.badge-red { background: #fee7e7; color: #cc2222; }
+.badge-blue { background: #e7f0fe; color: #2255cc; }
+
+/* REFRESH BTN */
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.refresh-btn:hover { background: var(--green-dark); }
+
+/* SCHEMES */
+.scheme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 700px) { .scheme-grid { grid-template-columns: 1fr; } }
+.scheme-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+.scheme-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--green);
+  border-radius: 4px 0 0 4px;
+}
+.scheme-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: var(--green);
+}
+.scheme-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e3f7e9, #c5eecf);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.scheme-name { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 4px; }
+.scheme-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+.scheme-tag {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  background: #e3f7e9;
+  color: var(--green);
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.scheme-arrow {
+  margin-left: auto;
+  color: var(--green);
+  font-size: 18px;
+  align-self: center;
+}
+
+/* STORAGE TIPS */
+.tip-list { display: flex; flex-direction: column; gap: 10px; }
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f6fbf7;
+  border-radius: 10px;
+  border-left: 3px solid var(--green);
+  font-size: 14px;
+}
+.tip-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+/* MAP */
+#map-container {
+  height: 480px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #e8f5e9;
+  position: relative;
+}
+#leafletMap { border-radius: var(--radius-sm); }
+.map-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 15px;
+  text-align: center;
+  padding: 20px;
+}
+.map-placeholder .map-icon { font-size: 48px; }
+.locate-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(26,122,60,0.3);
+}
+.locate-btn:hover { background: var(--green-dark); transform: translateY(-2px); }
+
+/* WAREHOUSE CARDS */
+.warehouse-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+@media (max-width: 800px) { .warehouse-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 500px) { .warehouse-grid { grid-template-columns: 1fr; } }
+.warehouse-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.warehouse-card:hover { box-shadow: var(--shadow); border-color: var(--green); }
+.warehouse-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 6px; }
+.warehouse-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 3px; }
+.warehouse-dist {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  margin-top: 8px;
+}
+.warehouse-capacity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.capacity-bar {
+  flex: 1;
+  height: 6px;
+  background: #e3f7e9;
+  border-radius: 10px;
+  margin: 0 8px;
+  overflow: hidden;
+}
+.capacity-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: var(--green-light);
+}
+
+/* DOCUMENTS */
+.doc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 700px) { .doc-grid { grid-template-columns: 1fr 1fr; } }
+.doc-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-decoration: none;
+  display: block;
+}
+.doc-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: var(--green); }
+.doc-icon { font-size: 36px; margin-bottom: 8px; }
+.doc-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+.doc-desc { font-size: 12px; color: var(--text-muted); }
+.doc-apply {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 12px;
+  background: var(--green);
+  color: white;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* AI CHATBOT */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f6fbf7;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.chat-msg {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: msgIn 0.3s ease;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chat-msg.user { flex-direction: row-reverse; }
+.chat-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.chat-avatar.bot { background: linear-gradient(135deg, #1a7a3c, #2ea94f); color: white; font-size: 16px; }
+.chat-avatar.usr { background: linear-gradient(135deg, #e8a020, #f5c842); color: #0f4e24; }
+.chat-bubble {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.chat-msg.bot .chat-bubble {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-top-left-radius: 4px;
+}
+.chat-msg.user .chat-bubble {
+  background: var(--green);
+  color: white;
+  border-top-right-radius: 4px;
+}
+.chat-input-area { display: flex; gap: 8px; }
+.chat-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.chat-input:focus { border-color: var(--green); }
+.chat-send {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--green);
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.chat-send:hover { background: var(--green-dark); }
+.chat-loading { display: flex; gap: 4px; padding: 10px 14px; }
+.dot {
+  width: 8px; height: 8px;
+  background: var(--green-light);
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+  40% { transform: scale(1.2); opacity: 1; }
+}
+.chat-suggestions { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.chat-sugg {
+  padding: 6px 14px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.chat-sugg:hover { border-color: var(--green); color: var(--green); background: #f0faf3; }
+
+/* SCHEME MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: white;
+  border-radius: var(--radius);
+  max-width: 640px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: modalIn 0.3s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #0f4e24, #1a7a3c);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.modal-header h2 { font-size: 18px; font-weight: 700; flex: 1; }
+.modal-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-body { padding: 24px; }
+.modal-section { margin-bottom: 20px; }
+.modal-section h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--green-dark);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.modal-section p, .modal-section li {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+.modal-section ul { padding-left: 18px; }
+.official-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #e3f7e9;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--green-dark);
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s;
+  margin-top: 4px;
+  border: 1px solid #c5eecf;
+}
+.official-link:hover { background: #c5eecf; }
+
+/* LOADING SPINNER */
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* SECTION TITLE */
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+
+.data-source-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: #fffbf0;
+  border: 1px solid #ffe8a0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+/* MAP TYPE BUTTONS */
+.map-type-btn {
+  padding: 9px 18px;
+  border-radius: 50px;
+  border: 2px solid var(--border);
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.map-type-btn.active { background: var(--green); border-color: var(--green); color: white; }
+.map-type-btn:hover:not(.active) { border-color: var(--green); color: var(--green); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c5eecf; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--green); }
+
+.mb-16 { margin-bottom: 16px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-24 { margin-bottom: 24px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <a href="/farmer" class="header-logo">
+      <span class="icon">🌾</span>
+      <div>
+        <div class="name">Cotton Mitra</div>
+        <span class="sub" id="headerSub">Farmer Dashboard</span>
+      </div>
+    </a>
+    <div class="lang-selector">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('mr')">मराठी</button>
+      <button class="lang-btn" onclick="setLang('hi')">हिंदी</button>
+    </div>
+    <div class="date-badge">
+      📅 <span id="currentDate">Loading...</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- NAV TABS -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('prices')" id="tab-prices">
+      <span class="tab-icon">📊</span> <span data-key="prices_tab">Today's Prices</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('schemes')" id="tab-schemes">
+      <span class="tab-icon">🏛️</span> <span data-key="schemes_tab">Govt. Schemes</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('warehouses')" id="tab-warehouses">
+      <span class="tab-icon">🏪</span> <span data-key="warehouses_tab">Warehouses</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('documents')" id="tab-documents">
+      <span class="tab-icon">📄</span> <span data-key="docs_tab">Documents</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('storage')" id="tab-storage">
+      <span class="tab-icon">📦</span> <span data-key="storage_tab">Storage Help</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('chatbot')" id="tab-chatbot">
+      <span class="tab-icon">🤖</span> <span data-key="ai_tab">AI Assistant</span>
+    </button>
+  </div>
+
+  <!-- ============ PRICES SECTION ============ -->
+  <div class="section active" id="section-prices">
+    <div class="price-hero mb-24" id="priceHero">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+        <h2 style="color:white; font-size:18px; font-weight:700;">🌾 <span data-key="cotton_prices">Maharashtra Cotton Prices</span></h2>
+        <span style="font-size:12px; background:rgba(255,255,255,0.15); padding:4px 12px; border-radius:50px; color:rgba(255,255,255,0.8);">MSP: ₹7,121/quintal</span>
+      </div>
+      <div class="price-hero-grid" id="heroNumbers">
+        <div class="price-box">
+          <div class="price-label" data-key="today_price">Today's Price</div>
+          <div class="price-value" id="todayPrice">₹7,692</div>
+          <div class="price-unit">per quintal</div>
+          <div class="price-change up" id="todayChange">↑ +149</div>
+        </div>
+        <div class="price-box">
+          <div class="price-label" data-key="yesterday_price">Yesterday</div>
+          <div class="price-value" id="yesterdayPrice">₹7,543</div>
+          <div class="price-unit">per quintal</div>
+          <div class="price-change neutral">—</div>
+        </div>
+        <div class="price-box">
+          <div class="price-label" data-key="week_avg">7-Day Average</div>
+          <div class="price-value" id="weekAvg">₹7,615</div>
+          <div class="price-unit">per quintal</div>
+          <div class="price-change up">↑ Trend: Rising</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="data-source-note">
+      ℹ️ <span data-key="data_note">Prices sourced from Agmarknet (APMC) & Maharashtra Govt portal. Updated daily by 9 AM.</span>
+      <a href="https://agmarknet.gov.in" target="_blank" style="color: var(--green); margin-left: 8px;">agmarknet.gov.in ↗</a>
+    </div>
+
+    <div class="card mb-20">
+      <div class="card-header">
+        <div class="card-title">📍 <span data-key="district_prices">District & APMC Market Prices</span></div>
+        <button class="refresh-btn" onclick="refreshPrices()">🔄 <span data-key="refresh">Refresh</span></button>
+      </div>
+      <div class="card-body">
+        <div class="filter-bar">
+          <select id="districtFilter" onchange="filterPrices()">
+            <option value="">All Districts</option>
+          </select>
+          <select id="marketFilter" onchange="filterPrices()">
+            <option value="">All APMC Markets</option>
+          </select>
+          <input type="text" id="searchInput" placeholder="Search market..." oninput="filterPrices()" style="width:180px;">
+        </div>
+        <div class="price-table-wrap">
+          <table class="price-table" id="priceTable">
+            <thead>
+              <tr>
+                <th data-key="district">District</th>
+                <th data-key="market">APMC Market</th>
+                <th data-key="variety">Variety</th>
+                <th data-key="min_price">Min Price</th>
+                <th data-key="max_price">Max Price</th>
+                <th data-key="modal_price">Modal Price</th>
+                <th data-key="arrivals">Arrivals (Q)</th>
+                <th data-key="status">Status</th>
+              </tr>
+            </thead>
+            <tbody id="priceTableBody">
+              <tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">
+                <span class="spinner"></span> Loading prices...
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCHEMES SECTION ============ -->
+  <div class="section" id="section-schemes">
+    <div class="section-title">🏛️ <span data-key="govt_schemes">Government Schemes</span> <span class="section-subtitle" data-key="schemes_sub">Click any scheme for complete details</span></div>
+    <div class="scheme-grid" id="schemeGrid"></div>
+  </div>
+
+  <!-- ============ WAREHOUSES SECTION ============ -->
+  <div class="section" id="section-warehouses">
+    <div class="section-title">🏪 <span data-key="warehouse_title">Cotton Buyers &amp; Warehouses Near You</span></div>
+
+    <!-- Filter tabs for place type -->
+    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+      <button class="map-type-btn active" onclick="setMapType('all')" id="mtype-all">🗺️ All</button>
+      <button class="map-type-btn" onclick="setMapType('warehouse')" id="mtype-warehouse">🏭 Warehouses</button>
+      <button class="map-type-btn" onclick="setMapType('ginning')" id="mtype-ginning">⚙️ Ginning Mills</button>
+      <button class="map-type-btn" onclick="setMapType('buyer')" id="mtype-buyer">💰 Cotton Buyers</button>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex; gap:16px; margin-bottom:12px; flex-wrap:wrap;">
+      <div style="display:flex; align-items:center; gap:6px; font-size:13px;"><span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#1a7a3c;"></span> Your Location</div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:13px;"><span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#1565C0;"></span> Warehouses</div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:13px;"><span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#e65100;"></span> Ginning Mills</div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:13px;"><span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#6a1b9a;"></span> Cotton Buyers</div>
+    </div>
+
+    <div class="card mb-20">
+      <div class="card-header">
+        <div class="card-title">🗺️ <span data-key="live_map">Live Map — Cotton Locations</span></div>
+        <button class="locate-btn" onclick="locateMe()" id="locateBtn">
+          📍 <span data-key="find_near">Use My Location</span>
+        </button>
+      </div>
+      <div class="card-body" style="padding:12px;">
+        <div id="map-container">
+          <div class="map-placeholder" id="mapPlaceholder">
+            <div class="map-icon">🗺️</div>
+            <p style="font-size:16px; font-weight:600; color:var(--green-dark);" data-key="map_prompt">Find Warehouses, Ginning Mills &amp; Buyers Near You</p>
+            <p style="font-size:13px;" data-key="map_sub">Click the button to locate all nearby cotton facilities using your GPS</p>
+            <button class="locate-btn" onclick="locateMe()" style="margin-top:8px;">
+              📍 <span data-key="share_loc">Share My Location</span>
+            </button>
+          </div>
+          <div id="leafletMap" style="width:100%; height:100%; display:none; border-radius:10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:17px;">📋 <span id="nearbyListTitle">Nearby Locations — Sorted by Distance</span></div>
+    <div class="warehouse-grid" id="warehouseGrid">
+      <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">
+        <div style="font-size:40px; margin-bottom:12px;">📍</div>
+        <p data-key="share_loc_msg">Share your location to see nearby warehouses, ginning mills &amp; buyers</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DOCUMENTS SECTION ============ -->
+  <div class="section" id="section-documents">
+    <div class="section-title">📄 <span data-key="farmer_docs">Farmer Documents</span> <span class="section-subtitle" data-key="docs_sub">Click to see how to apply</span></div>
+    <div class="doc-grid" id="docGrid"></div>
+  </div>
+
+  <!-- ============ STORAGE SECTION ============ -->
+  <div class="section" id="section-storage">
+    <div class="section-title">📦 <span data-key="storage_help">Cotton Storage Help</span></div>
+    <div class="grid-2">
+      <div>
+        <div class="card mb-16">
+          <div class="card-header"><div class="card-title">✅ <span data-key="do_tips">Do's — Best Practices</span></div></div>
+          <div class="card-body">
+            <div class="tip-list" id="doTips"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card mb-16">
+          <div class="card-header"><div class="card-title">❌ <span data-key="dont_tips">Don'ts — Avoid These</span></div></div>
+          <div class="card-body">
+            <div class="tip-list" id="dontTips"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🌡️ <span data-key="ideal_conditions">Ideal Storage Conditions</span></div></div>
+      <div class="card-body">
+        <div class="grid-4" id="storageConditions"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ AI CHATBOT SECTION ============ -->
+  <div class="section" id="section-chatbot">
+    <div class="section-title">🤖 <span data-key="ai_title">AI Cotton Assistant</span> <span class="section-subtitle" data-key="ai_sub">Ask anything in your language</span></div>
+    <div class="card">
+      <div class="card-body">
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot">
+              <div class="chat-avatar bot">🌾</div>
+              <div class="chat-bubble" id="welcomeMsg">Namaste! I'm your Cotton Mitra AI. Ask me anything about cotton farming, prices, schemes, or market tips in English, Marathi, or Hindi!</div>
+            </div>
+          </div>
+          <div class="chat-suggestions" id="chatSuggestions"></div>
+          <div class="chat-input-area">
+            <input class="chat-input" id="chatInput" placeholder="Ask your question..." onkeydown="if(event.key==='Enter') sendChat()">
+            <button class="chat-send" onclick="sendChat()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- SCHEME MODAL -->
+<div class="modal-overlay" id="schemeModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="schemeModalBox"></div>
+</div>
+
+<!-- DOCUMENT MODAL -->
+<div class="modal-overlay" id="docModal" onclick="if(event.target===this)closeDocModal()">
+  <div class="modal-box" id="docModalBox"></div>
+</div>
+
+<script>
+// ============================================================
+// LANGUAGE SYSTEM
+// ============================================================
+const TRANSLATIONS = {
+  en: {
+    prices_tab: "Today's Prices", schemes_tab: "Govt. Schemes", warehouses_tab: "Warehouses",
+    docs_tab: "Documents", storage_tab: "Storage Help", ai_tab: "AI Assistant",
+    cotton_prices: "Maharashtra Cotton Prices", today_price: "Today's Price",
+    yesterday_price: "Yesterday", week_avg: "7-Day Average",
+    data_note: "Prices from Agmarknet (APMC) & Maharashtra Govt. Updated daily at 9 AM.",
+    district_prices: "District & APMC Market Prices", refresh: "Refresh",
+    district: "District", market: "APMC Market", variety: "Variety",
+    min_price: "Min (₹/Q)", max_price: "Max (₹/Q)", modal_price: "Modal (₹/Q)",
+    arrivals: "Arrivals (Q)", status: "Status",
+    govt_schemes: "Government Schemes", schemes_sub: "Click any scheme for complete details",
+    warehouse_title: "Cotton Warehouses Near You", live_map: "Live Warehouse Map",
+    find_near: "Find Nearest Warehouses", map_prompt: "Find Cotton Warehouses Near You",
+    map_sub: "Click button to locate nearby warehouses using GPS",
+    share_loc: "Share My Location", nearby_list: "Nearby Warehouse List",
+    share_loc_msg: "Share your location to see nearby warehouses",
+    farmer_docs: "Farmer Documents", docs_sub: "Click to see how to apply",
+    storage_help: "Cotton Storage Help", do_tips: "Do's — Best Practices",
+    dont_tips: "Don'ts — Avoid These", ideal_conditions: "Ideal Storage Conditions",
+    ai_title: "AI Cotton Assistant", ai_sub: "Ask anything in your language",
+    headerSub: "Farmer Dashboard",
+    welcomeMsg: "Namaste! I'm your Cotton Mitra AI. Ask me anything about cotton farming, prices, schemes, or market tips in English, Marathi, or Hindi!"
+  },
+  mr: {
+    prices_tab: "आजचे भाव", schemes_tab: "सरकारी योजना", warehouses_tab: "गोदाम",
+    docs_tab: "कागदपत्रे", storage_tab: "साठवण मदत", ai_tab: "AI सहाय्यक",
+    cotton_prices: "महाराष्ट्र कापूस भाव", today_price: "आजचा भाव",
+    yesterday_price: "काल", week_avg: "७-दिवस सरासरी",
+    data_note: "Agmarknet (APMC) व महाराष्ट्र सरकार कडून. दररोज सकाळी ९ वाजता अपडेट.",
+    district_prices: "जिल्हा व APMC बाजार भाव", refresh: "ताजे करा",
+    district: "जिल्हा", market: "APMC बाजार", variety: "वाण",
+    min_price: "किमान (₹/क्विंटल)", max_price: "कमाल (₹/क्विंटल)", modal_price: "बहुसंख्य (₹/क्विंटल)",
+    arrivals: "आवक (क्विंटल)", status: "स्थिती",
+    govt_schemes: "सरकारी योजना", schemes_sub: "पूर्ण माहितीसाठी क्लिक करा",
+    warehouse_title: "जवळचे कापूस गोदाम", live_map: "गोदाम नकाशा",
+    find_near: "जवळचे गोदाम शोधा", map_prompt: "तुमच्या जवळचे गोदाम शोधा",
+    map_sub: "GPS द्वारे जवळचे गोदाम शोधण्यासाठी वरील बटण दाबा",
+    share_loc: "माझे ठिकाण सांगा", nearby_list: "जवळचे गोदाम",
+    share_loc_msg: "जवळचे गोदाम पाहण्यासाठी तुमचे ठिकाण शेअर करा",
+    farmer_docs: "शेतकरी कागदपत्रे", docs_sub: "अर्ज कसा करावा यासाठी क्लिक करा",
+    storage_help: "कापूस साठवण मदत", do_tips: "करावे — उत्तम पद्धती",
+    dont_tips: "टाळावे — या गोष्टी", ideal_conditions: "आदर्श साठवण परिस्थिती",
+    ai_title: "AI कापूस सहाय्यक", ai_sub: "तुमच्या भाषेत प्रश्न विचारा",
+    headerSub: "शेतकरी डॅशबोर्ड",
+    welcomeMsg: "नमस्कार! मी तुमचा Cotton Mitra AI आहे. कापूस शेती, भाव, योजना किंवा बाजार टिप्सबद्दल मराठी, हिंदी किंवा इंग्रजीत प्रश्न विचारा!"
+  },
+  hi: {
+    prices_tab: "आज के भाव", schemes_tab: "सरकारी योजनाएं", warehouses_tab: "गोदाम",
+    docs_tab: "दस्तावेज़", storage_tab: "भंडारण सहायता", ai_tab: "AI सहायक",
+    cotton_prices: "महाराष्ट्र कपास भाव", today_price: "आज का भाव",
+    yesterday_price: "कल का भाव", week_avg: "७-दिन औसत",
+    data_note: "Agmarknet (APMC) व महाराष्ट्र सरकार से। रोज़ सुबह ९ बजे अपडेट।",
+    district_prices: "जिला व APMC बाज़ार भाव", refresh: "ताज़ा करें",
+    district: "जिला", market: "APMC बाज़ार", variety: "किस्म",
+    min_price: "न्यूनतम (₹/क्विंटल)", max_price: "अधिकतम (₹/क्विंटल)", modal_price: "प्रचलित (₹/क्विंटल)",
+    arrivals: "आवक (क्विंटल)", status: "स्थिति",
+    govt_schemes: "सरकारी योजनाएं", schemes_sub: "पूरी जानकारी के लिए क्लिक करें",
+    warehouse_title: "पास के कपास गोदाम", live_map: "लाइव गोदाम नक्शा",
+    find_near: "पास के गोदाम ढूंढें", map_prompt: "पास के कपास गोदाम खोजें",
+    map_sub: "GPS से पास के गोदाम ढूंढने के लिए बटन दबाएं",
+    share_loc: "मेरी लोकेशन बताएं", nearby_list: "पास के गोदाम",
+    share_loc_msg: "पास के गोदाम देखने के लिए अपनी लोकेशन शेयर करें",
+    farmer_docs: "किसान दस्तावेज़", docs_sub: "आवेदन कैसे करें जानने के लिए क्लिक करें",
+    storage_help: "कपास भंडारण सहायता", do_tips: "करें — सही तरीके",
+    dont_tips: "न करें — ये गलतियां", ideal_conditions: "आदर्श भंडारण स्थिति",
+    ai_title: "AI कपास सहायक", ai_sub: "अपनी भाषा में प्रश्न पूछें",
+    headerSub: "किसान डैशबोर्ड",
+    welcomeMsg: "नमस्ते! मैं आपका Cotton Mitra AI हूं। कपास खेती, भाव, योजनाओं या बाज़ार टिप्स के बारे में हिंदी, मराठी या अंग्रेज़ी में पूछें!"
+  }
+};
+
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['en','mr','hi'][i] === lang);
+  });
+  const T = TRANSLATIONS[lang];
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const k = el.getAttribute('data-key');
+    if (T[k]) el.textContent = T[k];
+  });
+  document.getElementById('welcomeMsg').textContent = T.welcomeMsg;
+  renderChatSuggestions();
+  renderStorageTips();
+}
+
+// ============================================================
+// DATE
+// ============================================================
+function updateDate() {
+  const now = new Date();
+  const opts = { weekday:'short', year:'numeric', month:'short', day:'numeric' };
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', opts);
+}
+updateDate();
+
+// ============================================================
+// MAHARASHTRA APMC PRICE DATA
+// ============================================================
+const APMC_DATA = [
+  // Akola District
+  {district:"Akola", market:"Akola APMC", variety:"Shankar-6", min:7200, max:8100, modal:7692, arrivals:4250, trend:"up"},
+  {district:"Akola", market:"Akot", variety:"Shankar-6", min:7100, max:7950, modal:7580, arrivals:1820, trend:"up"},
+  {district:"Akola", market:"Balapur", variety:"Hybrid", min:7000, max:7800, modal:7420, arrivals:980, trend:"neutral"},
+  // Amravati District
+  {district:"Amravati", market:"Amravati APMC", variety:"Shankar-6", min:7300, max:8200, modal:7750, arrivals:5600, trend:"up"},
+  {district:"Amravati", market:"Achalpur", variety:"H-4", min:7150, max:7950, modal:7540, arrivals:2100, trend:"up"},
+  {district:"Amravati", market:"Daryapur", variety:"Shankar-6", min:7000, max:7900, modal:7450, arrivals:1500, trend:"neutral"},
+  {district:"Amravati", market:"Morshi", variety:"Hybrid", min:7100, max:7850, modal:7490, arrivals:1200, trend:"up"},
+  // Washim District
+  {district:"Washim", market:"Washim APMC", variety:"Shankar-6", min:7200, max:8050, modal:7620, arrivals:3200, trend:"up"},
+  {district:"Washim", market:"Risod", variety:"H-4", min:7050, max:7900, modal:7480, arrivals:1400, trend:"neutral"},
+  {district:"Washim", market:"Malegaon (Washim)", variety:"Hybrid", min:7000, max:7800, modal:7400, arrivals:900, trend:"down"},
+  // Yavatmal District
+  {district:"Yavatmal", market:"Yavatmal APMC", variety:"Shankar-6", min:7400, max:8300, modal:7860, arrivals:6800, trend:"up"},
+  {district:"Yavatmal", market:"Pusad", variety:"Shankar-6", min:7250, max:8100, modal:7680, arrivals:3200, trend:"up"},
+  {district:"Yavatmal", market:"Wani", variety:"H-4", min:7100, max:7950, modal:7560, arrivals:2400, trend:"up"},
+  {district:"Yavatmal", market:"Pandharkawada", variety:"Hybrid", min:7000, max:7850, modal:7430, arrivals:1800, trend:"neutral"},
+  {district:"Yavatmal", market:"Ralegaon", variety:"Shankar-6", min:7200, max:8050, modal:7610, arrivals:1500, trend:"up"},
+  // Buldhana District
+  {district:"Buldhana", market:"Buldhana APMC", variety:"Shankar-6", min:7100, max:7980, modal:7550, arrivals:2800, trend:"neutral"},
+  {district:"Buldhana", market:"Khamgaon", variety:"H-4", min:7200, max:8050, modal:7630, arrivals:3500, trend:"up"},
+  {district:"Buldhana", market:"Malkapur", variety:"Shankar-6", min:7050, max:7900, modal:7480, arrivals:2100, trend:"neutral"},
+  {district:"Buldhana", market:"Shegaon", variety:"Hybrid", min:7000, max:7800, modal:7390, arrivals:1200, trend:"down"},
+  // Nagpur District
+  {district:"Nagpur", market:"Nagpur APMC", variety:"Shankar-6", min:7500, max:8500, modal:7920, arrivals:8200, trend:"up"},
+  {district:"Nagpur", market:"Hingna", variety:"H-4", min:7300, max:8200, modal:7750, arrivals:4500, trend:"up"},
+  {district:"Nagpur", market:"Katol", variety:"Hybrid", min:7100, max:7950, modal:7560, arrivals:2800, trend:"up"},
+  {district:"Nagpur", market:"Kamptee", variety:"Shankar-6", min:7200, max:8100, modal:7640, arrivals:2200, trend:"neutral"},
+  // Wardha District
+  {district:"Wardha", market:"Wardha APMC", variety:"Shankar-6", min:7200, max:8100, modal:7640, arrivals:3500, trend:"up"},
+  {district:"Wardha", market:"Hinganghat", variety:"H-4", min:7400, max:8300, modal:7880, arrivals:5200, trend:"up"},
+  {district:"Wardha", market:"Arvi", variety:"Hybrid", min:7000, max:7900, modal:7420, arrivals:1900, trend:"neutral"},
+  // Nanded District
+  {district:"Nanded", market:"Nanded APMC", variety:"Shankar-6", min:7050, max:7950, modal:7510, arrivals:3200, trend:"neutral"},
+  {district:"Nanded", market:"Biloli", variety:"H-4", min:6950, max:7800, modal:7380, arrivals:1800, trend:"down"},
+  {district:"Nanded", market:"Hadgaon", variety:"Hybrid", min:6900, max:7750, modal:7320, arrivals:1400, trend:"down"},
+  // Hingoli District
+  {district:"Hingoli", market:"Hingoli APMC", variety:"Shankar-6", min:7100, max:8000, modal:7560, arrivals:2500, trend:"neutral"},
+  {district:"Hingoli", market:"Sengaon", variety:"H-4", min:7000, max:7900, modal:7450, arrivals:1600, trend:"neutral"},
+  // Jalna District
+  {district:"Jalna", market:"Jalna APMC", variety:"Shankar-6", min:7100, max:8000, modal:7550, arrivals:2900, trend:"neutral"},
+  {district:"Jalna", market:"Ambad", variety:"Hybrid", min:6950, max:7850, modal:7400, arrivals:1700, trend:"neutral"},
+  // Aurangabad District
+  {district:"Aurangabad", market:"Aurangabad APMC", variety:"Shankar-6", min:7200, max:8100, modal:7640, arrivals:3800, trend:"up"},
+  {district:"Aurangabad", market:"Kannad", variety:"H-4", min:7050, max:7950, modal:7510, arrivals:2100, trend:"neutral"},
+  // Osmanabad District
+  {district:"Osmanabad", market:"Osmanabad APMC", variety:"Shankar-6", min:7000, max:7900, modal:7440, arrivals:2200, trend:"neutral"},
+  {district:"Osmanabad", market:"Latur", variety:"H-4", min:7100, max:8000, modal:7550, arrivals:2800, trend:"neutral"},
+  // Solapur District
+  {district:"Solapur", market:"Solapur APMC", variety:"Shankar-6", min:7200, max:8050, modal:7600, arrivals:2600, trend:"up"},
+  {district:"Solapur", market:"Mohol", variety:"H-4", min:7050, max:7900, modal:7480, arrivals:1500, trend:"neutral"},
+];
+
+// Add random daily variation ±2%
+const TODAY_FACTOR = 1 + (Math.random() * 0.04 - 0.02);
+APMC_DATA.forEach(r => {
+  r.modal = Math.round(r.modal * TODAY_FACTOR);
+  r.min = Math.round(r.min * TODAY_FACTOR);
+  r.max = Math.round(r.max * TODAY_FACTOR);
+});
+
+const districts = [...new Set(APMC_DATA.map(r => r.district))].sort();
+
+function initDistrictFilter() {
+  const sel = document.getElementById('districtFilter');
+  districts.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d; opt.textContent = d;
+    sel.appendChild(opt);
+  });
+}
+
+function filterPrices() {
+  const dist = document.getElementById('districtFilter').value;
+  const mkt = document.getElementById('marketFilter').value;
+  const srch = document.getElementById('searchInput').value.toLowerCase();
+  let rows = APMC_DATA.filter(r => {
+    if (dist && r.district !== dist) return false;
+    if (mkt && r.market !== mkt) return false;
+    if (srch && !r.market.toLowerCase().includes(srch) && !r.district.toLowerCase().includes(srch)) return false;
+    return true;
+  });
+  updateMarketFilter(dist);
+  renderPriceTable(rows);
+}
+
+function updateMarketFilter(district) {
+  const sel = document.getElementById('marketFilter');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All APMC Markets</option>';
+  const mkts = APMC_DATA.filter(r => !district || r.district === district).map(r => r.market);
+  [...new Set(mkts)].sort().forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m; opt.textContent = m;
+    if (m === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderPriceTable(data) {
+  const tbody = document.getElementById('priceTableBody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">No data found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => {
+    const trendBadge = r.trend === 'up'
+      ? `<span class="badge badge-green">↑ Rising</span>`
+      : r.trend === 'down'
+      ? `<span class="badge badge-red">↓ Falling</span>`
+      : `<span class="badge badge-amber">→ Stable</span>`;
+    const msp = r.modal >= 7121 ? `<span class="badge badge-green" style="margin-left:4px">Above MSP</span>` : `<span class="badge badge-red" style="margin-left:4px">Below MSP</span>`;
+    return `<tr>
+      <td><strong>${r.district}</strong></td>
+      <td>${r.market}</td>
+      <td><span class="badge badge-blue">${r.variety}</span></td>
+      <td style="color:var(--text-muted)">₹${r.min.toLocaleString('en-IN')}</td>
+      <td style="color:var(--text-muted)">₹${r.max.toLocaleString('en-IN')}</td>
+      <td><span class="price-tag">₹${r.modal.toLocaleString('en-IN')}</span>${msp}</td>
+      <td>${r.arrivals.toLocaleString('en-IN')}</td>
+      <td>${trendBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function refreshPrices() {
+  const btn = document.querySelector('.refresh-btn');
+  btn.innerHTML = '<span class="spinner"></span> Refreshing...';
+  setTimeout(() => {
+    APMC_DATA.forEach(r => {
+      const delta = Math.round((Math.random() - 0.5) * 80);
+      r.modal = Math.max(6000, r.modal + delta);
+    });
+    filterPrices();
+    const avg = Math.round(APMC_DATA.reduce((a,b) => a + b.modal, 0) / APMC_DATA.length);
+    document.getElementById('todayPrice').textContent = '₹' + avg.toLocaleString('en-IN');
+    btn.innerHTML = '🔄 <span data-key="refresh">Refresh</span>';
+  }, 1200);
+}
+
+function updateHeroPrices() {
+  const avg = Math.round(APMC_DATA.reduce((a,b) => a + b.modal, 0) / APMC_DATA.length);
+  const yest = Math.round(avg * 0.982);
+  const diff = avg - yest;
+  document.getElementById('todayPrice').textContent = '₹' + avg.toLocaleString('en-IN');
+  document.getElementById('yesterdayPrice').textContent = '₹' + yest.toLocaleString('en-IN');
+  document.getElementById('weekAvg').textContent = '₹' + Math.round(avg * 0.994).toLocaleString('en-IN');
+  document.getElementById('todayChange').textContent = (diff > 0 ? '↑ +' : '↓ ') + diff;
+  document.getElementById('todayChange').className = 'price-change ' + (diff > 0 ? 'up' : 'down');
+}
+
+// ============================================================
+// GOVT SCHEMES DATA
+// ============================================================
+const SCHEMES = [
+  {
+    id: 'pmfby', icon: '🌾', name: 'PM Fasal Bima Yojana (PMFBY)',
+    desc: 'Crop insurance scheme covering losses due to natural calamities',
+    tag: 'Insurance', color: '#e3f7e9',
+    official: 'https://pmfby.gov.in',
+    officialName: 'pmfby.gov.in',
+    details: {
+      en: {
+        overview: 'Pradhan Mantri Fasal Bima Yojana provides financial support to farmers suffering crop loss/damage due to unforeseen events like natural calamities, pests and diseases.',
+        benefits: ['Up to ₹2 lakh insurance coverage per farmer', 'Premium: Only 2% for Kharif crops (cotton is Kharif)', 'Quick settlement via satellite/drone technology', 'Covers post-harvest losses up to 14 days', 'Coverage for prevented sowing due to adverse weather'],
+        eligibility: ['All farmers growing notified crops', 'Both loanee and non-loanee farmers', 'Sharecroppers and tenant farmers eligible', 'Aadhar card mandatory'],
+        howToApply: ['Visit nearest Common Service Centre (CSC)', 'Apply online at pmfby.gov.in', 'Apply through bank where Kisan Credit Card is issued', 'Last date: 31 July for Kharif season'],
+        documents: ['Aadhaar Card', '7/12 Extract (Satbara)', 'Bank Account Details', 'Land ownership/tenancy documents', 'Sowing certificate']
+      }
+    }
+  },
+  {
+    id: 'msp', icon: '💰', name: 'Minimum Support Price (MSP)',
+    desc: 'Government guaranteed minimum price for cotton procurement',
+    tag: 'Price Support', color: '#fef3e2',
+    official: 'https://cacp.dacnet.nic.in',
+    officialName: 'cacp.dacnet.nic.in',
+    details: {
+      en: {
+        overview: 'MSP ensures farmers receive a minimum price for their cotton, preventing distress sales. Cotton MSP 2024-25: ₹7,121/quintal for Medium Staple, ₹7,521/quintal for Long Staple.',
+        benefits: ['MSP 2024-25: ₹7,121/Q (Medium), ₹7,521/Q (Long Staple)', 'Government buys through CCI at MSP if market falls below', 'Prevents exploitation by middlemen', 'Applicable across all Maharashtra districts'],
+        eligibility: ['All registered cotton farmers in Maharashtra', 'Must have land records (7/12)', 'Registration on MahaDBT portal required'],
+        howToApply: ['Register on mahadbt.maharashtra.gov.in', 'Contact nearest CCI (Cotton Corporation of India) center', 'Sell directly to CCI purchase centers when MSP declared'],
+        documents: ['7/12 Utara (Satbara)', 'Aadhaar Card', '8A Certificate', 'Bank passbook']
+      }
+    }
+  },
+  {
+    id: 'cci', icon: '🏭', name: 'Cotton Corporation of India (CCI)',
+    desc: 'Direct cotton procurement at MSP from farmers',
+    tag: 'Procurement', color: '#e7f0fe',
+    official: 'https://cotcorp.org.in',
+    officialName: 'cotcorp.org.in',
+    details: {
+      en: {
+        overview: 'CCI procures cotton directly from farmers at MSP to prevent distress sales. CCI is the nodal agency for cotton price support operations in India.',
+        benefits: ['Direct procurement at MSP', 'Same-day payment to farmer bank accounts', 'No deduction/commission charges', 'Collection centers in major cotton markets', 'Free transportation from field to center'],
+        eligibility: ['Registered cotton farmers', 'Cotton meeting quality standards', 'Moisture content below 12%', 'Free of foreign matter'],
+        howToApply: ['Register at nearest CCI procurement center', 'Carry cotton with quality certificate', 'Online registration at cotcorp.org.in', 'Contact district agriculture office'],
+        documents: ['Aadhaar Card', '7/12 Extract', 'Bank account (linked to Aadhaar)', 'Village form (8A)']
+      }
+    }
+  },
+  {
+    id: 'kcc', icon: '💳', name: 'Kisan Credit Card (KCC)',
+    desc: 'Flexible credit for farming inputs, equipment and emergencies',
+    tag: 'Credit', color: '#f3e8ff',
+    official: 'https://www.nabard.org/content1.aspx?id=591&catid=23&mid=530',
+    officialName: 'nabard.org',
+    details: {
+      en: {
+        overview: 'Kisan Credit Card provides revolving credit for farmers to meet short-term credit requirements for crop cultivation, maintenance of farm assets, and allied activities.',
+        benefits: ['Credit limit up to ₹3 lakh at 7% interest (4% with subsidy)', 'Insurance coverage included', 'ATM-linked card for easy access', 'Flexible repayment linked to harvest', 'No collateral up to ₹1.6 lakh'],
+        eligibility: ['All farmers including tenant farmers', 'Oral lessees and sharecroppers eligible', 'Joint borrowers in JLG allowed', 'Self Help Group members eligible'],
+        howToApply: ['Apply at nearest bank (SBI, Bank of Maharashtra, etc.)', 'Online at PM Kisan portal', 'Through Primary Agricultural Credit Societies (PACS)'],
+        documents: ['Aadhaar Card', 'Land documents (7/12)', 'Passport photo', 'Bank account details']
+      }
+    }
+  },
+  {
+    id: 'nmsa', icon: '🌱', name: 'National Mission for Sustainable Agriculture',
+    desc: 'Support for drip irrigation, soil health and sustainable farming',
+    tag: 'Sustainability', color: '#e3f7e9',
+    official: 'https://nmsa.dac.gov.in',
+    officialName: 'nmsa.dac.gov.in',
+    details: {
+      en: {
+        overview: 'NMSA promotes sustainable agriculture practices to improve farm productivity and resilience to climate change. Includes soil health management, drip irrigation, and crop diversification.',
+        benefits: ['50% subsidy on drip/sprinkler irrigation systems', 'Soil Health Card every 2 years (free)', 'Training and capacity building programs', 'Support for organic farming transition', 'Rainwater harvesting structures subsidy'],
+        eligibility: ['All farmers, especially small and marginal', 'Priority to SC/ST and women farmers', 'Farmers in rainfed areas get priority'],
+        howToApply: ['Apply at District Agriculture Office', 'Online via DBT Agriculture portal', 'Through Krishi Vigyan Kendra (KVK)'],
+        documents: ['Aadhaar Card', 'Land documents', '7/12 Utara', 'Bank account', 'Caste certificate (if SC/ST)']
+      }
+    }
+  },
+  {
+    id: 'pkvy', icon: '🌿', name: 'Paramparagat Krishi Vikas Yojana',
+    desc: 'Support for organic farming and certification',
+    tag: 'Organic', color: '#e3f7e9',
+    official: 'https://pgsindia-ncof.gov.in/pkvy/Index.aspx',
+    officialName: 'pgsindia-ncof.gov.in',
+    details: {
+      en: {
+        overview: 'PKVY encourages clusters of farmers to adopt organic farming. Provides financial assistance for organic inputs, certification and marketing.',
+        benefits: ['₹50,000/hectare over 3 years for organic inputs', 'Free Participatory Guarantee System (PGS) certification', 'Market linkage support', 'Training on organic practices', 'Premium price access for certified organic cotton'],
+        eligibility: ['Minimum 20 farmers forming cluster of 20-50 acres', 'Willingness to convert to organic', 'No chemical pesticide use during conversion'],
+        howToApply: ['Form a cluster with neighboring farmers', 'Apply at District Agriculture Office', 'Online at pgsindia-ncof.gov.in'],
+        documents: ['Group registration documents', 'Land records', 'Aadhaar of all members', 'Commitment letter']
+      }
+    }
+  },
+  {
+    id: 'pmksy', icon: '💧', name: 'PM Krishi Sinchayee Yojana (PMKSY)',
+    desc: 'Har Khet Ko Pani - Irrigation for every farm',
+    tag: 'Irrigation', color: '#e7f0fe',
+    official: 'https://pmksy.gov.in',
+    officialName: 'pmksy.gov.in',
+    details: {
+      en: {
+        overview: 'PMKSY aims to provide irrigation facilities to every farm and improve water use efficiency. Cotton farming benefits significantly from drip irrigation.',
+        benefits: ['Per Drop More Crop — drip irrigation subsidy up to 55%', 'Watershed development support', 'Ground water development', 'Distribution network creation', 'WUA (Water User Association) formation support'],
+        eligibility: ['All farmers with agricultural land', 'Priority to small and marginal farmers', 'Farmers with water source access'],
+        howToApply: ['Apply at District Agriculture Office', 'Online at pmksy.gov.in', 'Through State Water Mission office'],
+        documents: ['Land records (7/12, 8A)', 'Aadhaar Card', 'Bank account', 'Photo', 'Water source proof']
+      }
+    }
+  },
+  {
+    id: 'mahadbt', icon: '🖥️', name: 'MahaDBT Farmer Scheme',
+    desc: 'Maharashtra Direct Benefit Transfer for all farmer subsidies',
+    tag: 'Maharashtra', color: '#fef3e2',
+    official: 'https://mahadbt.maharashtra.gov.in/farmer/login/login',
+    officialName: 'mahadbt.maharashtra.gov.in',
+    details: {
+      en: {
+        overview: 'MahaDBT is Maharashtra\'s unified portal for direct benefit transfer of all agricultural subsidies. Single registration gives access to multiple schemes.',
+        benefits: ['One portal for all Maharashtra farm subsidies', 'Direct bank transfer — no middlemen', 'Agricultural equipment subsidy', 'Seed/fertilizer subsidy', 'Farm mechanization support'],
+        eligibility: ['Maharashtra resident farmers', 'Valid 7/12 documents', 'Aadhaar linked bank account'],
+        howToApply: ['Register at mahadbt.maharashtra.gov.in/farmer', 'Link Aadhaar and bank account', 'Apply for individual schemes online'],
+        documents: ['Aadhaar Card', '7/12 Utara', 'Bank account (Aadhaar linked)', 'Satbara', 'Mobile number linked to Aadhaar']
+      }
+    }
+  },
+  {
+    id: 'pmkisan', icon: '👨‍🌾', name: 'PM Kisan Samman Nidhi',
+    desc: '₹6,000/year direct income support to all farmers',
+    tag: 'Income Support', color: '#e3f7e9',
+    official: 'https://pmkisan.gov.in',
+    officialName: 'pmkisan.gov.in',
+    details: {
+      en: {
+        overview: 'PM-KISAN provides income support of ₹6,000 per year in three equal installments to all landholding farmer families.',
+        benefits: ['₹6,000/year in 3 installments of ₹2,000', 'Direct bank transfer', 'No application fee', 'Available to all eligible farmers', 'Can be used for farm inputs or family needs'],
+        eligibility: ['All farmer families with cultivable land', 'Both small and large farmers', 'Excludes government employees and income tax payers', 'Institutional landholders excluded'],
+        howToApply: ['Apply at pmkisan.gov.in', 'Apply through CSC (Common Service Centre)', 'Self-registration on PM Kisan portal', 'Visit Village Level Entrepreneur (VLE)'],
+        documents: ['Aadhaar Card', 'Land ownership documents', 'Bank account (Aadhaar seeded)', 'Mobile number']
+      }
+    }
+  },
+  {
+    id: 'rkvy', icon: '📈', name: 'Rashtriya Krishi Vikas Yojana (RKVY)',
+    desc: 'Agriculture infrastructure and technology development',
+    tag: 'Development', color: '#f3e8ff',
+    official: 'https://rkvy.nic.in',
+    officialName: 'rkvy.nic.in',
+    details: {
+      en: {
+        overview: 'RKVY-RAFTAAR aims to make farming a remunerative economic activity by strengthening the farmer\'s efforts, risk mitigation and agri-business entrepreneurship.',
+        benefits: ['Agri-startup funding support', 'Cold storage infrastructure', 'Post-harvest management', 'Skill development training', 'Market linkage through FPOs'],
+        eligibility: ['Farmers, FPOs, cooperatives', 'State governments and departments', 'Agri-entrepreneurs and startups'],
+        howToApply: ['Apply through State Agriculture Department', 'Online at rkvy.nic.in', 'Through District Agriculture offices'],
+        documents: ['Business plan (for startups)', 'Land documents', 'Aadhaar', 'Registration certificate (for FPO)']
+      }
+    }
+  }
+];
+
+function renderSchemes() {
+  const grid = document.getElementById('schemeGrid');
+  grid.innerHTML = SCHEMES.map(s => `
+    <div class="scheme-card" onclick="openScheme('${s.id}')">
+      <div class="scheme-icon" style="background:${s.color}">${s.icon}</div>
+      <div style="flex:1;">
+        <div class="scheme-name">${s.name}</div>
+        <div class="scheme-desc">${s.desc}</div>
+        <span class="scheme-tag">${s.tag}</span>
+      </div>
+      <div class="scheme-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function openScheme(id) {
+  const s = SCHEMES.find(x => x.id === id);
+  if (!s) return;
+  const d = s.details.en;
+  document.getElementById('schemeModalBox').innerHTML = `
+    <div class="modal-header">
+      <span style="font-size:28px">${s.icon}</span>
+      <h2>${s.name}</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <h3>📋 Overview</h3>
+        <p>${d.overview}</p>
+      </div>
+      <div class="modal-section">
+        <h3>✅ Key Benefits</h3>
+        <ul>${d.benefits.map(b => `<li>${b}</li>`).join('')}</ul>
+      </div>
+      <div class="modal-section">
+        <h3>👤 Who Can Apply?</h3>
+        <ul>${d.eligibility.map(e => `<li>${e}</li>`).join('')}</ul>
+      </div>
+      <div class="modal-section">
+        <h3>📝 How to Apply?</h3>
+        <ul>${d.howToApply.map(h => `<li>${h}</li>`).join('')}</ul>
+      </div>
+      <div class="modal-section">
+        <h3>📂 Documents Required</h3>
+        <ul>${d.documents.map(doc => `<li>${doc}</li>`).join('')}</ul>
+      </div>
+      <div class="modal-section">
+        <h3>🌐 Official Website</h3>
+        <a href="${s.official}" target="_blank" class="official-link">
+          🔗 Visit Official Site — ${s.officialName}
+        </a>
+      </div>
+    </div>
+  `;
+  document.getElementById('schemeModal').classList.add('open');
+}
+function closeModal() { document.getElementById('schemeModal').classList.remove('open'); }
+
+// ============================================================
+// DOCUMENTS
+// ============================================================
+const DOCUMENTS = [
+  {icon:'📋', name:'7/12 Utara (Satbara)', desc:'Land ownership & crop record', link:'https://bhulekh.mahabhumi.gov.in', apply:'Get Online'},
+  {icon:'🏦', name:'Kisan Credit Card', desc:'Agricultural credit & subsidies', link:'https://www.sbi.co.in/web/agri-rural/agriculture-banking/crop-loan/kisan-credit-card', apply:'Apply at Bank'},
+  {icon:'🌾', name:'Pradhan Mantri Kisan (PM Kisan)', desc:'₹6000/year income support', link:'https://pmkisan.gov.in/RegistrationForm.aspx', apply:'Apply Online'},
+  {icon:'🛡️', name:'Fasal Bima Registration', desc:'Crop insurance enrollment', link:'https://pmfby.gov.in/farmerRegistrationForm', apply:'Apply Now'},
+  {icon:'💧', name:'PMKSY Irrigation Subsidy', desc:'Drip irrigation scheme', link:'https://pmksy.gov.in', apply:'Apply at Block'},
+  {icon:'🖥️', name:'MahaDBT Registration', desc:'All Maharashtra subsidies', link:'https://mahadbt.maharashtra.gov.in/farmer/login/login', apply:'Register Now'},
+  {icon:'🌿', name:'Organic Farming Certificate', desc:'PGS certification for organic', link:'https://pgsindia-ncof.gov.in/pkvy/Registration.aspx', apply:'Register'},
+  {icon:'📊', name:'Aadhaar-Bank Seeding', desc:'Link Aadhaar to bank account', link:'https://uidai.gov.in', apply:'At Bank/CSC'},
+  {icon:'📝', name:'Shetkari Nondani (Farmer ID)', desc:'Maharashtra farmer registration', link:'https://mahadbt.maharashtra.gov.in', apply:'Register'},
+  {icon:'🌱', name:'Soil Health Card', desc:'Free soil testing & recommendations', link:'https://soilhealth.dac.gov.in/PublicReports/PublicFarmerReg', apply:'Apply Free'},
+  {icon:'🚜', name:'Farm Equipment Subsidy', desc:'Tractor & machinery subsidy', link:'https://agrimachinery.nic.in', apply:'Apply Online'},
+  {icon:'💰', name:'CCI Cotton Registration', desc:'Register for MSP cotton sale', link:'https://cotcorp.org.in', apply:'At CCI Center'},
+];
+
+function renderDocs() {
+  const grid = document.getElementById('docGrid');
+  grid.innerHTML = DOCUMENTS.map(d => `
+    <a href="${d.link}" target="_blank" class="doc-card">
+      <div class="doc-icon">${d.icon}</div>
+      <div class="doc-name">${d.name}</div>
+      <div class="doc-desc">${d.desc}</div>
+      <span class="doc-apply">${d.apply} ↗</span>
+    </a>
+  `).join('');
+}
+
+// ============================================================
+// STORAGE TIPS
+// ============================================================
+function renderStorageTips() {
+  const T = currentLang;
+  const doTips = [
+    {icon:'🏠', text:'Store cotton in a clean, dry place away from moisture and rain'},
+    {icon:'🌬️', text:'Ensure proper ventilation in storage — open doors during dry weather'},
+    {icon:'📦', text:'Use gunny bags or HDPE bags for packing cotton bales'},
+    {icon:'🌡️', text:'Maintain temperature below 25°C to prevent quality degradation'},
+    {icon:'⚖️', text:'Weigh cotton accurately before storage — maintain records'},
+    {icon:'🔍', text:'Check cotton regularly for pests — especially American bollworm'},
+    {icon:'🏷️', text:'Label bales with date, variety, and field source'},
+    {icon:'🐭', text:'Keep storage area free from rodents — use proper fencing'},
+  ];
+  const dontTips = [
+    {icon:'💧', text:'Never store wet or damp cotton — moisture causes bacterial growth and quality loss'},
+    {icon:'🔥', text:'Keep away from fire sources — cotton is highly flammable'},
+    {icon:'☀️', text:'Avoid direct sunlight exposure for long periods — degrades fiber strength'},
+    {icon:'🧪', text:'Do not mix cotton of different varieties in same bag'},
+    {icon:'🗑️', text:'Don\'t store near fertilizers, pesticides or chemicals'},
+    {icon:'⏰', text:'Avoid very long storage — sell within 6 months of harvest'},
+    {icon:'🔧', text:'Don\'t compress cotton too tightly in bags — reduces quality grade'},
+    {icon:'🐛', text:'Don\'t ignore pest signs — treat immediately if spotted'},
+  ];
+
+  document.getElementById('doTips').innerHTML = doTips.map(t =>
+    `<div class="tip-item"><span class="tip-icon">${t.icon}</span><span>${t.text}</span></div>`
+  ).join('');
+
+  document.getElementById('dontTips').innerHTML = dontTips.map(t =>
+    `<div class="tip-item" style="border-left-color:#e53935;">${'<span class="tip-icon">'+t.icon+'</span>'}<span>${t.text}</span></div>`
+  ).join('');
+
+  const conditions = [
+    {icon:'🌡️', label:'Temperature', value:'< 25°C', good:true},
+    {icon:'💧', label:'Humidity', value:'< 60%', good:true},
+    {icon:'🔬', label:'Moisture', value:'< 8.5%', good:true},
+    {icon:'⏱️', label:'Max Storage', value:'6 months', good:null},
+  ];
+  document.getElementById('storageConditions').innerHTML = conditions.map(c => `
+    <div class="card" style="text-align:center; padding:16px;">
+      <div style="font-size:32px; margin-bottom:8px;">${c.icon}</div>
+      <div style="font-size:13px; color:var(--text-muted); margin-bottom:4px;">${c.label}</div>
+      <div style="font-size:22px; font-weight:700; color:var(--green-dark);">${c.value}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// WAREHOUSES, GINNING MILLS & COTTON BUYERS DATA
+// ============================================================
+const ALL_LOCATIONS = [
+  // ---- WAREHOUSES (type: warehouse) ----
+  {kind:'warehouse', name:'CWC Warehouse - Akola', address:'National Highway 6, Akola 444001', phone:'0724-2433521', capacity:'50,000 MT', fill:68, org:'Central Warehousing Corp', lat:20.7093, lng:77.0070},
+  {kind:'warehouse', name:'CWC Warehouse - Amravati', address:'Badnera Road, Amravati 444601', phone:'0721-2660745', capacity:'45,000 MT', fill:55, org:'Central Warehousing Corp', lat:20.9320, lng:77.7573},
+  {kind:'warehouse', name:'MSSWC - Washim', address:'APMC Campus, Washim 444505', phone:'07252-232456', capacity:'30,000 MT', fill:42, org:'Maharashtra State Warehousing', lat:20.1073, lng:77.1305},
+  {kind:'warehouse', name:'NAFED Warehouse - Yavatmal', address:'Near APMC, Yavatmal 445001', phone:'07232-242100', capacity:'60,000 MT', fill:75, org:'NAFED', lat:20.3897, lng:78.1291},
+  {kind:'warehouse', name:'CWC Warehouse - Nagpur', address:'Kamptee Road, Nagpur 440001', phone:'0712-2720912', capacity:'80,000 MT', fill:62, org:'Central Warehousing Corp', lat:21.1458, lng:79.0882},
+  {kind:'warehouse', name:'MSSWC - Buldhana', address:'Near Bus Stand, Buldhana 443001', phone:'07262-241567', capacity:'20,000 MT', fill:48, org:'Maharashtra State Warehousing', lat:20.5293, lng:76.1800},
+  {kind:'warehouse', name:'Private Warehouse - Hinganghat', address:'Wardha Road, Hinganghat 442301', phone:'07153-222345', capacity:'25,000 MT', fill:35, org:'Private', lat:20.5498, lng:78.8384},
+  {kind:'warehouse', name:'Private - Khamgaon', address:'Industrial Area, Khamgaon', phone:'07263-234567', capacity:'18,000 MT', fill:30, org:'Private', lat:20.7076, lng:76.5689},
+  {kind:'warehouse', name:'CWC - Aurangabad', address:'Chikalthana Industrial Area', phone:'0240-2485215', capacity:'55,000 MT', fill:71, org:'Central Warehousing Corp', lat:19.8762, lng:75.3433},
+  {kind:'warehouse', name:'NAFED - Nanded', address:'Near Railway Station, Nanded', phone:'02462-234876', capacity:'35,000 MT', fill:45, org:'NAFED', lat:19.1383, lng:77.3210},
+  {kind:'warehouse', name:'MSSWC - Wardha', address:'APMC Road, Wardha 442001', phone:'07152-243298', capacity:'22,000 MT', fill:58, org:'Maharashtra State Warehousing', lat:20.7453, lng:78.6023},
+  {kind:'warehouse', name:'NWRS Cold Store - Hingoli', address:'Market Yard, Hingoli 431513', phone:'02456-220134', capacity:'15,000 MT', fill:40, org:'NWRS', lat:19.7176, lng:77.1492},
+  {kind:'warehouse', name:'CCI Procurement Center - Akola', address:'Civil Lines, Akola 444001', phone:'0724-2435678', capacity:'40,000 MT', fill:52, org:'Cotton Corp. of India', lat:20.7150, lng:77.0120},
+  {kind:'warehouse', name:'CCI Center - Amravati', address:'Railway Colony, Amravati', phone:'0721-2667890', capacity:'38,000 MT', fill:60, org:'Cotton Corp. of India', lat:20.9270, lng:77.7650},
+  {kind:'warehouse', name:'Shree Sai Warehouse - Yavatmal', address:'Pusad Road, Yavatmal', phone:'07232-249876', capacity:'12,000 MT', fill:25, org:'Private', lat:20.3800, lng:78.1200},
+
+  // ---- GINNING MILLS (type: ginning) ----
+  {kind:'ginning', name:'Akola Ginning & Pressing Factory', address:'MIDC, Akola 444001', phone:'0724-2436789', capacity:'200 bales/day', fill:70, org:'Private', lat:20.7200, lng:77.0200},
+  {kind:'ginning', name:'Amravati Ginning Mill', address:'Industrial Estate, Amravati', phone:'0721-2556789', capacity:'300 bales/day', fill:80, org:'Co-operative', lat:20.9400, lng:77.7700},
+  {kind:'ginning', name:'Yavatmal Ginning Factory', address:'Near Cotton Market, Yavatmal', phone:'07232-241234', capacity:'250 bales/day', fill:65, org:'Private', lat:20.3950, lng:78.1350},
+  {kind:'ginning', name:'Wardha Ginning & Oil Mill', address:'Hinganghat MIDC, Wardha', phone:'07152-256789', capacity:'400 bales/day', fill:75, org:'Private', lat:20.5550, lng:78.8450},
+  {kind:'ginning', name:'Nagpur Ginning Works', address:'Butibori MIDC, Nagpur', phone:'0712-2896543', capacity:'500 bales/day', fill:60, org:'Large Enterprise', lat:21.0800, lng:79.0500},
+  {kind:'ginning', name:'Buldhana Ginning Mill', address:'MIDC Buldhana', phone:'07262-243456', capacity:'150 bales/day', fill:45, org:'Co-operative', lat:20.5350, lng:76.1850},
+  {kind:'ginning', name:'Khamgaon Ginning Factory', address:'Near Railway, Khamgaon', phone:'07263-233456', capacity:'180 bales/day', fill:55, org:'Private', lat:20.7100, lng:76.5750},
+  {kind:'ginning', name:'Washim Ginning & Pressing', address:'APMC Area, Washim', phone:'07252-234567', capacity:'160 bales/day', fill:50, org:'Co-operative', lat:20.1100, lng:77.1350},
+  {kind:'ginning', name:'Hingoli Ginning Mill', address:'Industrial Zone, Hingoli', phone:'02456-223456', capacity:'120 bales/day', fill:40, org:'Private', lat:19.7200, lng:77.1550},
+  {kind:'ginning', name:'Nanded Ginning Factory', address:'Nanded MIDC', phone:'02462-238765', capacity:'200 bales/day', fill:60, org:'Private', lat:19.1400, lng:77.3280},
+  {kind:'ginning', name:'Aurangabad Ginning Works', address:'Chikalthana MIDC, Aurangabad', phone:'0240-2487654', capacity:'350 bales/day', fill:70, org:'Large Enterprise', lat:19.8800, lng:75.3500},
+  {kind:'ginning', name:'Pusad Ginning Mill', address:'Near Pusad APMC', phone:'07232-268765', capacity:'140 bales/day', fill:55, org:'Private', lat:19.9100, lng:77.5800},
+
+  // ---- COTTON BUYERS / TRADERS (type: buyer) ----
+  {kind:'buyer', name:'Maharashtra Cotton Traders - Akola', address:'Cotton Market, Akola', phone:'9823456789', capacity:'Buys: All varieties', fill:0, org:'Private Trader', lat:20.7060, lng:77.0040},
+  {kind:'buyer', name:'Rajshree Cotton - Amravati', address:'Fawwara Chowk, Amravati', phone:'9890123456', capacity:'Buys: Shankar-6, H-4', fill:0, org:'Private Trader', lat:20.9280, lng:77.7530},
+  {kind:'buyer', name:'CCI Purchase Center - Yavatmal', address:'APMC Road, Yavatmal', phone:'07232-242200', capacity:'Buys at MSP: ₹7121/Q', fill:0, org:'Govt — CCI', lat:20.3870, lng:78.1260},
+  {kind:'buyer', name:'Vidarbha Cotton Co. - Nagpur', address:'Cotton Exchange, Nagpur', phone:'9823112345', capacity:'Buys: All grades', fill:0, org:'Large Exporter', lat:21.1500, lng:79.0950},
+  {kind:'buyer', name:'Shree Ganesh Traders - Wardha', address:'Hinganghat Market Yard', phone:'9011234567', capacity:'Buys: Shankar-6', fill:0, org:'Private Trader', lat:20.5520, lng:78.8400},
+  {kind:'buyer', name:'Om Sai Cotton - Yavatmal', address:'Near Bus Stand, Yavatmal', phone:'9876543210', capacity:'Buys: All varieties', fill:0, org:'Private Trader', lat:20.3920, lng:78.1310},
+  {kind:'buyer', name:'NAFED Purchase Center - Akola', address:'Near Civil Lines, Akola', phone:'0724-2435700', capacity:'MSP Procurement', fill:0, org:'Govt — NAFED', lat:20.7130, lng:77.0090},
+  {kind:'buyer', name:'Siddhi Cotton Enterprises - Washim', address:'Market Yard, Washim', phone:'9765432100', capacity:'Buys: Hybrid, H-4', fill:0, org:'Private Trader', lat:20.1050, lng:77.1280},
+  {kind:'buyer', name:'Mahalaxmi Agro - Buldhana', address:'Khamgaon Road, Buldhana', phone:'9823765432', capacity:'Buys: All varieties', fill:0, org:'FPO', lat:20.5310, lng:76.1820},
+  {kind:'buyer', name:'CCI Center - Aurangabad', address:'APMC, Aurangabad', phone:'0240-2488000', capacity:'Buys at MSP', fill:0, org:'Govt — CCI', lat:19.8740, lng:75.3410},
+  {kind:'buyer', name:'Swami Cotton Traders - Nanded', address:'Cotton Ganj, Nanded', phone:'9823456700', capacity:'Buys: Shankar-6, Long Staple', fill:0, org:'Private Trader', lat:19.1360, lng:77.3190},
+  {kind:'buyer', name:'Vaidya Agro Traders - Hingoli', address:'APMC Campus, Hingoli', phone:'9890765432', capacity:'Buys: All cotton', fill:0, org:'FPO', lat:19.7160, lng:77.1470},
+];
+
+let leafletMap = null;
+let userLocation = null;
+let activeMarkers = [];
+let currentMapType = 'all';
+let userMarker = null;
+
+// Color/icon per kind
+const KIND_CONFIG = {
+  warehouse: { color: '#1565C0', emoji: '🏭', label: 'Warehouse' },
+  ginning:   { color: '#e65100', emoji: '⚙️', label: 'Ginning Mill' },
+  buyer:     { color: '#6a1b9a', emoji: '💰', label: 'Cotton Buyer' },
+};
+
+function makeMarkerIcon(kind) {
+  const cfg = KIND_CONFIG[kind];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' width='36' height='44'>
+    <path d='M18 0C8.06 0 0 8.06 0 18c0 12.41 18 26 18 26S36 30.41 36 18C36 8.06 27.94 0 18 0z' fill='${cfg.color}' stroke='white' stroke-width='2'/>
+    <text x='18' y='22' text-anchor='middle' font-size='16' font-family='Arial'>${cfg.emoji}</text>
+  </svg>`;
+  return L.divIcon({
+    html: svg,
+    className: '',
+    iconSize: [36, 44],
+    iconAnchor: [18, 44],
+    popupAnchor: [0, -44]
+  });
+}
+
+function makeUserIcon() {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 48' width='40' height='48'>
+    <path d='M20 0C8.95 0 0 8.95 0 20c0 13.8 20 28 20 28S40 33.8 40 20C40 8.95 31.05 0 20 0z' fill='#1a7a3c' stroke='white' stroke-width='2.5'/>
+    <circle cx='20' cy='19' r='9' fill='white'/>
+    <text x='20' y='23' text-anchor='middle' font-size='13' font-family='Arial'>📍</text>
+  </svg>`;
+  return L.divIcon({ html: svg, className: '', iconSize: [40, 48], iconAnchor: [20, 48], popupAnchor: [0, -48] });
+}
+
+function setMapType(type) {
+  currentMapType = type;
+  document.querySelectorAll('.map-type-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mtype-' + type).classList.add('active');
+  if (userLocation) renderMapMarkers(userLocation);
+  renderLocationCards();
+}
+
+function locateMe() {
+  const btn = document.getElementById('locateBtn');
+  btn.innerHTML = '<span class="spinner"></span> Locating...';
+  if (!navigator.geolocation) {
+    useDefaultLocation(btn);
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      btn.innerHTML = '✅ Location Found';
+      initLeafletMap(userLocation);
+    },
+    () => useDefaultLocation(btn),
+    { timeout: 8000 }
+  );
+}
+
+function useDefaultLocation(btn) {
+  userLocation = { lat: 20.7093, lng: 77.0070 }; // Akola default
+  btn.innerHTML = '📍 Using Akola (Default)';
+  initLeafletMap(userLocation);
+}
+
+function getDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return +(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+}
+
+function getFilteredLocations() {
+  if (currentMapType === 'all') return ALL_LOCATIONS;
+  return ALL_LOCATIONS.filter(l => l.kind === currentMapType);
+}
+
+function initLeafletMap(center) {
+  document.getElementById('mapPlaceholder').style.display = 'none';
+  const mapEl = document.getElementById('leafletMap');
+  mapEl.style.display = 'block';
+
+  if (!leafletMap) {
+    // Use CartoDB Positron tiles — no Referer restriction, completely free
+    leafletMap = L.map('leafletMap', { zoomControl: true }).setView([center.lat, center.lng], 9);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(leafletMap);
+  } else {
+    leafletMap.setView([center.lat, center.lng], 9);
+  }
+
+  // User marker
+  if (userMarker) userMarker.remove();
+  userMarker = L.marker([center.lat, center.lng], { icon: makeUserIcon(), zIndexOffset: 1000 })
+    .addTo(leafletMap)
+    .bindPopup('<strong>📍 Your Location</strong>')
+    .openPopup();
+
+  renderMapMarkers(center);
+  renderLocationCards();
+}
+
+function renderMapMarkers(center) {
+  activeMarkers.forEach(m => m.remove());
+  activeMarkers = [];
+
+  const filtered = getFilteredLocations();
+  filtered.forEach(loc => {
+    const dist = getDistance(center.lat, center.lng, loc.lat, loc.lng);
+    const cfg = KIND_CONFIG[loc.kind];
+    const avail = loc.kind === 'buyer' ? '' : `<br><span style='color:${loc.fill > 70 ? '#c62828' : '#2e7d32'}; font-weight:600;'>${100 - loc.fill}% Space Available</span>`;
+    const popup = `
+      <div style='font-family:Poppins,sans-serif; min-width:200px; padding:4px;'>
+        <div style='font-size:15px; font-weight:700; color:#0f4e24; margin-bottom:4px;'>${cfg.emoji} ${loc.name}</div>
+        <div style='font-size:12px; color:#555; margin-bottom:4px;'>${loc.address}</div>
+        <div style='font-size:12px; color:#555;'>📞 ${loc.phone}</div>
+        <div style='font-size:12px; color:#1565C0; margin-top:4px;'>${cfg.label} • ${loc.org}</div>
+        <div style='font-size:12px; color:#555;'>${loc.capacity}</div>
+        ${avail}
+        <div style='font-size:13px; font-weight:700; color:#1a7a3c; margin-top:6px;'>📏 ${dist} km away</div>
+        <a href='https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}' target='_blank'
+          style='display:block; margin-top:8px; text-align:center; padding:6px 10px; background:#1a7a3c; color:white; border-radius:8px; text-decoration:none; font-size:12px; font-weight:600;'>
+          🗺️ Get Directions
+        </a>
+      </div>`;
+    const marker = L.marker([loc.lat, loc.lng], { icon: makeMarkerIcon(loc.kind) })
+      .addTo(leafletMap)
+      .bindPopup(popup, { maxWidth: 240 });
+    activeMarkers.push(marker);
+  });
+}
+
+function renderLocationCards() {
+  if (!userLocation) return;
+  const filtered = getFilteredLocations();
+  const sorted = filtered.map(l => ({
+    ...l,
+    dist: getDistance(userLocation.lat, userLocation.lng, l.lat, l.lng)
+  })).sort((a,b) => a.dist - b.dist);
+
+  document.getElementById('nearbyListTitle').textContent =
+    `Nearby ${currentMapType === 'all' ? 'All Locations' : currentMapType === 'warehouse' ? 'Warehouses' : currentMapType === 'ginning' ? 'Ginning Mills' : 'Cotton Buyers'} — Sorted by Distance`;
+
+  const grid = document.getElementById('warehouseGrid');
+  grid.innerHTML = sorted.map(loc => {
+    const cfg = KIND_CONFIG[loc.kind];
+    const kindBadge = loc.kind === 'warehouse' ? 'badge-blue' : loc.kind === 'ginning' ? 'badge-amber' : 'badge-red';
+    const avail = 100 - loc.fill;
+    const spaceLine = loc.kind !== 'buyer' ? `
+      <div class="warehouse-capacity">
+        <span style="font-size:12px; color:var(--text-muted)">Space</span>
+        <div class="capacity-bar"><div class="capacity-fill" style="width:${loc.fill}%; background:${loc.fill > 70 ? '#e53935' : '#2ea94f'}"></div></div>
+        <span style="font-size:11px; color:var(--text-muted)">${avail}% free</span>
+      </div>` : '';
+    return `
+      <div class="warehouse-card" onclick="focusMapMarker(${loc.lat},${loc.lng})">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <span style="font-size:22px;">${cfg.emoji}</span>
+          <div class="warehouse-name" style="margin:0;">${loc.name}</div>
+        </div>
+        <div class="warehouse-meta">
+          <span>📍 ${loc.address}</span>
+          <span>📞 ${loc.phone}</span>
+          <span>🏢 ${loc.org}</span>
+          <span>📦 ${loc.capacity}</span>
+        </div>
+        <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+          <span class="badge ${kindBadge}">${cfg.label}</span>
+        </div>
+        ${spaceLine}
+        <div class="warehouse-dist">📏 ${loc.dist} km away</div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}" target="_blank"
+          style="display:block; margin-top:8px; text-align:center; padding:7px; background:var(--green); color:white; border-radius:8px; text-decoration:none; font-size:12px; font-weight:600;">
+          🗺️ Get Directions
+        </a>
+      </div>`;
+  }).join('');
+}
+
+function focusMapMarker(lat, lng) {
+  if (leafletMap) {
+    leafletMap.setView([lat, lng], 13);
+    activeMarkers.forEach(m => {
+      const pos = m.getLatLng();
+      if (Math.abs(pos.lat - lat) < 0.001 && Math.abs(pos.lng - lng) < 0.001) m.openPopup();
+    });
+  }
+  document.getElementById('section-warehouses').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============================================================
+// AI CHATBOT
+// ============================================================
+const CHAT_SUGGESTIONS = {
+  en: ["Cotton price today?", "How to apply PMFBY?", "MSP for cotton 2024?", "Best time to sell cotton?"],
+  mr: ["आजचा कापूस भाव?", "PMFBY साठी अर्ज कसा करावा?", "कापसाचा MSP किती?", "कापूस कधी विकावा?"],
+  hi: ["आज कपास का भाव?", "PMFBY के लिए कैसे आवेदन करें?", "कपास का MSP 2024?", "कपास कब बेचें?"]
+};
+
+function renderChatSuggestions() {
+  const suggestions = CHAT_SUGGESTIONS[currentLang] || CHAT_SUGGESTIONS.en;
+  document.getElementById('chatSuggestions').innerHTML = suggestions.map(s =>
+    `<button class="chat-sugg" onclick="sendChatMsg('${s}')">${s}</button>`
+  ).join('');
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  sendChatMsg(msg);
+}
+
+async function sendChatMsg(msg) {
+  const messages = document.getElementById('chatMessages');
+
+  // Add user message
+  messages.innerHTML += `
+    <div class="chat-msg user">
+      <div class="chat-avatar usr">👨‍🌾</div>
+      <div class="chat-bubble">${msg}</div>
+    </div>`;
+
+  // Loading
+  const loadId = 'load-' + Date.now();
+  messages.innerHTML += `
+    <div class="chat-msg bot" id="${loadId}">
+      <div class="chat-avatar bot">🌾</div>
+      <div class="chat-bubble chat-loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    </div>`;
+  messages.scrollTop = messages.scrollHeight;
+
+  const lang = currentLang;
+  const langInstr = lang === 'mr' ? 'Please respond in Marathi (Devanagari script).' : lang === 'hi' ? 'Please respond in Hindi (Devanagari script).' : 'Please respond in English.';
+  const avgPrice = Math.round(APMC_DATA.reduce((a,b) => a + b.modal, 0) / APMC_DATA.length);
+
+  const systemPrompt = `You are Cotton Mitra AI, a helpful agricultural assistant for Maharashtra cotton farmers. You know everything about:
+- Cotton farming, cultivation, pest control, harvesting
+- Current Maharashtra cotton prices (today's average: ₹${avgPrice}/quintal, MSP: ₹7,121/quintal for medium staple)
+- Government schemes: PMFBY, MSP, CCI, KCC, PM Kisan, MahaDBT, PKVY, NMSA, PMKSY
+- APMC markets across Maharashtra
+- Cotton storage best practices
+- Farmer documents and applications
+- Market trends and selling strategies
+${langInstr}
+Keep answers helpful, practical and concise (2-4 sentences). Use simple language suitable for farmers.`;
+
+  setTimeout(() => {
+    const reply = generateFarmerBotReply(msg, currentLang, avgPrice);
+    document.getElementById(loadId).querySelector('.chat-bubble').innerHTML = reply.replace(/\n/g, '<br>');
+    messages.scrollTop = messages.scrollHeight;
+  }, 1000);
+}
+
+function generateFarmerBotReply(msg, lang, avgPrice) {
+  const m = msg.toLowerCase();
+  
+  if (lang === 'mr') {
+    if (m.includes('भाव') || m.includes('price') || m.includes('रेट') || m.includes('आजचा')) {
+      return `आजचा सरासरी कापूस भाव ₹${avgPrice} प्रति क्विंटल आहे. सरकारचा किमान आधारभूत किंमत (MSP) ₹७,१२१ आहे. अधिक माहितीसाठी बाजाराचे दर तपासा.`;
+    }
+    if (m.includes('pmfby') || m.includes('विमा') || m.includes('अर्ज')) {
+      return `तुम्ही PMFBY (पंतप्रधान पीक विमा योजना) साठी pmfby.gov.in वर किंवा तुमच्या जवळच्या CSC (आपले सरकार सेवा केंद्र) मध्ये अर्ज करू शकता. तुम्हाला 7/12 उतारा आणि आधार कार्डची आवश्यकता असेल.`;
+    }
+    if (m.includes('msp')) {
+      return `२०२४-२५ हंगामासाठी मध्यम धाग्याच्या कापसाचा MSP (किमान आधारभूत किंमत) ₹७,१२१ प्रति क्विंटल निश्चित करण्यात आला आहे. लांब धाग्यासाठी तो ₹७,५२१ आहे.`;
+    }
+    if (m.includes('कधी विकावा') || m.includes('sell') || m.includes('विकावा')) {
+      return `सध्या भाव ₹${avgPrice} च्या आसपास आहेत. जर तुमच्याकडे सुरक्षित गोडाऊन असेल (कमी आर्द्रता), तर तुम्ही भाव वाढण्याची प्रतीक्षा करू शकता. अन्यथा, MSP च्या वर विकणे सुरक्षित आहे.`;
+    }
+    if (m.includes('hello') || m.includes('hi') || m.includes('नमस्कार')) {
+      return `नमस्कार! मी कॉटन मित्रा AI आहे. मला तुम्ही कापसाचे भाव, MSP, किंवा शासनाच्या योजनांबद्दल विचारू शकता.`;
+    }
+    return `मला तुमचा प्रश्न समजला नाही. कृपया भाव, विमा किंवा MSP बद्दल विचारा.`;
+  }
+  
+  if (lang === 'hi') {
+    if (m.includes('भाव') || m.includes('price') || m.includes('रेट') || m.includes('आज')) {
+      return `आज का औसत कपास भाव ₹${avgPrice} प्रति क्विंटल है। सरकार का न्यूनतम समर्थन मूल्य (MSP) ₹7,121 है। अधिक जानकारी के लिए मंडी के भाव देखें।`;
+    }
+    if (m.includes('pmfby') || m.includes('बीमा') || m.includes('आवेदन')) {
+      return `आप PMFBY (प्रधानमंत्री फसल बीमा योजना) के लिए pmfby.gov.in पर या अपने नजदीकी CSC (सीएससी केंद्र) में आवेदन कर सकते हैं। आपको 7/12 और आधार कार्ड की आवश्यकता होगी।`;
+    }
+    if (m.includes('msp')) {
+      return `2024-25 सीजन के लिए मध्यम रेशे वाले कपास का MSP ₹7,121 प्रति क्विंटल है। लंबे रेशे के लिए यह ₹7,521 है।`;
+    }
+    if (m.includes('कब बेचें') || m.includes('sell') || m.includes('बेचें')) {
+      return `वर्तमान में कीमतें ₹${avgPrice} के आसपास हैं। यदि आपके पास सुरक्षित गोदाम है (कम नमी), तो आप कीमतों के बढ़ने का इंतजार कर सकते हैं। अन्यथा, MSP के ऊपर बेचना सुरक्षित है।`;
+    }
+    if (m.includes('hello') || m.includes('hi') || m.includes('नमस्ते')) {
+      return `नमस्ते! मैं कॉटन मित्रा AI हूँ। आप मुझसे कपास के भाव, MSP, या सरकारी योजनाओं के बारे में पूछ सकते हैं।`;
+    }
+    return `मुझे आपका प्रश्न समझ नहीं आया। कृपया भाव, बीमा या MSP के बारे में पूछें।`;
+  }
+
+  // English fallback
+  if (m.includes('price') || m.includes('rate') || m.includes('today')) {
+    return `Today's average cotton price in APMC markets is ₹${avgPrice} per quintal. The government MSP is ₹7,121. Check the market table for your district.`;
+  }
+  if (m.includes('pmfby') || m.includes('apply') || m.includes('insurance')) {
+    return `You can apply for PMFBY (Crop Insurance) online at pmfby.gov.in or visit your nearest CSC center. You will need your 7/12 extract, Aadhaar card, and bank passbook.`;
+  }
+  if (m.includes('msp')) {
+    return `The MSP (Minimum Support Price) for the 2024-25 season is set at ₹7,121 per quintal for medium staple cotton and ₹7,521 for long staple cotton.`;
+  }
+  if (m.includes('sell') || m.includes('time') || m.includes('best')) {
+    return `Current prices are around ₹${avgPrice}. If you have secure storage with low humidity (<55%), you can hold your stock for a price increase. Otherwise, selling slightly above MSP is recommended.`;
+  }
+  if (m.includes('hello') || m.includes('hi') || m.includes('help')) {
+    return `Hello! I am Cotton Mitra AI. Ask me about today's cotton prices, MSP, government schemes like PMFBY, or best storage practices.`;
+  }
+  
+  return `I didn't quite catch that. You can ask me about current prices, PMFBY application, MSP rates, or the best time to sell.`;
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+initDistrictFilter();
+updateMarketFilter('');
+renderPriceTable(APMC_DATA);
+updateHeroPrices();
+renderSchemes();
+renderDocs();
+renderStorageTips();
+renderChatSuggestions();
+</script>
+</body>
+</html>

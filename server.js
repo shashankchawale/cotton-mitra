@@ -48,6 +48,7 @@ const inventorySchema = new mongoose.Schema({
   warehouse:   { type: String, default: 'Warehouse A' },
   location:    { type: String, default: 'Section 1' },
   harvestDate: { type: Date, default: Date.now },
+  arrival_date:{ type: Date, default: Date.now }, // Added for aging analysis
   status:      { type: String, enum: ['In Stock', 'Reserved', 'Shipped', 'Low Stock'], default: 'In Stock' },
   pricePerBale:{ type: Number, default: 1200 },
   humidity:    { type: Number, default: 55 },
@@ -112,21 +113,22 @@ async function seedDatabase() {
   try {
     const invCount = await Inventory.countDocuments();
     if (invCount > 0) { console.log('📦 Database already seeded.'); return; }
-
+    
     console.log('🌱 Seeding database with sample data...');
 
-    // Inventory
+    // Inventory with varied arrival dates for aging analysis
+    const now = new Date();
     const inventoryData = [
-      { batchId: 'BATCH-001', grade: 'Premium', bales: 820, warehouse: 'Warehouse A', location: 'Section 1', status: 'In Stock', pricePerBale: 1450, humidity: 52, temperature: 21 },
-      { batchId: 'BATCH-002', grade: 'Premium', bales: 650, warehouse: 'Warehouse A', location: 'Section 2', status: 'Reserved', pricePerBale: 1450, humidity: 54, temperature: 22 },
-      { batchId: 'BATCH-003', grade: 'Standard', bales: 480, warehouse: 'Warehouse B', location: 'Section 1', status: 'In Stock', pricePerBale: 1200, humidity: 61, temperature: 23 },
-      { batchId: 'BATCH-004', grade: 'Standard', bales: 390, warehouse: 'Warehouse B', location: 'Section 2', status: 'In Stock', pricePerBale: 1200, humidity: 58, temperature: 22 },
-      { batchId: 'BATCH-005', grade: 'Economy',  bales: 120, warehouse: 'Warehouse C', location: 'Section 1', status: 'Low Stock', pricePerBale: 900, humidity: 57, temperature: 24 },
-      { batchId: 'BATCH-006', grade: 'Premium', bales: 950, warehouse: 'Warehouse A', location: 'Section 3', status: 'In Stock', pricePerBale: 1480, humidity: 50, temperature: 20 },
-      { batchId: 'BATCH-007', grade: 'Standard', bales: 580, warehouse: 'Warehouse C', location: 'Section 2', status: 'In Stock', pricePerBale: 1220, humidity: 55, temperature: 22 },
-      { batchId: 'BATCH-008', grade: 'Economy',  bales: 90,  warehouse: 'Warehouse C', location: 'Section 3', status: 'Low Stock', pricePerBale: 880, humidity: 60, temperature: 25 },
-      { batchId: 'BATCH-009', grade: 'Premium', bales: 760, warehouse: 'Warehouse A', location: 'Section 4', status: 'Reserved', pricePerBale: 1460, humidity: 51, temperature: 21 },
-      { batchId: 'BATCH-010', grade: 'Standard', bales: 210, warehouse: 'Warehouse B', location: 'Section 3', status: 'Low Stock', pricePerBale: 1180, humidity: 59, temperature: 23 },
+      { batchId: 'BATCH-001', grade: 'Premium', bales: 820, warehouse: 'Warehouse A', location: 'Section 1', status: 'In Stock', pricePerBale: 1450, humidity: 52, temperature: 21, arrival_date: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000) },
+      { batchId: 'BATCH-002', grade: 'Premium', bales: 650, warehouse: 'Warehouse A', location: 'Section 2', status: 'Reserved', pricePerBale: 1450, humidity: 54, temperature: 22, arrival_date: new Date(now.getTime() - 95 * 24 * 60 * 60 * 1000) }, // AGING
+      { batchId: 'BATCH-003', grade: 'Standard', bales: 480, warehouse: 'Warehouse B', location: 'Section 1', status: 'In Stock', pricePerBale: 1200, humidity: 61, temperature: 23, arrival_date: new Date(now.getTime() - 45 * 24 * 60 * 60 * 1000) },
+      { batchId: 'BATCH-004', grade: 'Standard', bales: 390, warehouse: 'Warehouse B', location: 'Section 2', status: 'In Stock', pricePerBale: 1200, humidity: 58, temperature: 22, arrival_date: new Date(now.getTime() - 100 * 24 * 60 * 60 * 1000) }, // AGING
+      { batchId: 'BATCH-005', grade: 'Economy',  bales: 120, warehouse: 'Warehouse C', location: 'Section 1', status: 'Low Stock', pricePerBale: 900, humidity: 57, temperature: 24, arrival_date: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000) },
+      { batchId: 'BATCH-006', grade: 'Premium', bales: 950, warehouse: 'Warehouse A', location: 'Section 3', status: 'In Stock', pricePerBale: 1480, humidity: 50, temperature: 20, arrival_date: new Date(now.getTime() - 120 * 24 * 60 * 60 * 1000) }, // AGING
+      { batchId: 'BATCH-007', grade: 'Standard', bales: 580, warehouse: 'Warehouse C', location: 'Section 2', status: 'In Stock', pricePerBale: 1220, humidity: 55, temperature: 22, arrival_date: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) },
+      { batchId: 'BATCH-008', grade: 'Economy',  bales: 90,  warehouse: 'Warehouse C', location: 'Section 3', status: 'Low Stock', pricePerBale: 880, humidity: 60, temperature: 25, arrival_date: new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000) },
+      { batchId: 'BATCH-009', grade: 'Premium', bales: 760, warehouse: 'Warehouse A', location: 'Section 4', status: 'Reserved', pricePerBale: 1460, humidity: 51, temperature: 21, arrival_date: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000) },
+      { batchId: 'BATCH-010', grade: 'Standard', bales: 210, warehouse: 'Warehouse B', location: 'Section 3', status: 'Low Stock', pricePerBale: 1180, humidity: 59, temperature: 23, arrival_date: new Date(now.getTime() - 80 * 24 * 60 * 60 * 1000) },
     ];
     await Inventory.insertMany(inventoryData);
 
@@ -199,6 +201,11 @@ app.get('/dashboard', (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
+
+// Farmer Routes
+app.use('/farmer', express.static(path.join(__dirname, 'farmer')));
+app.get('/farmer', (req, res) => res.sendFile(path.join(__dirname, 'farmer', 'index.html')));
+app.get('/farmer/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'farmer', 'farmdashboard.html')));
 
 // ─── Auth Routes ──────────────────────────────────────────────────────────────
 app.get('/api/config', (req, res) => {
@@ -295,16 +302,16 @@ app.get('/api/dashboard/stats', requireAuth, async (req, res) => {
 
 // ─── Demo Data (used when MongoDB unavailable) ────────────────────────────────
 const DEMO_INVENTORY = [
-  { _id:'d1', batchId:'BATCH-001', grade:'Premium',  bales:820, warehouse:'Warehouse A', location:'Section 1', status:'In Stock',  pricePerBale:1450, humidity:52 },
-  { _id:'d2', batchId:'BATCH-002', grade:'Premium',  bales:650, warehouse:'Warehouse A', location:'Section 2', status:'Reserved',  pricePerBale:1450, humidity:54 },
-  { _id:'d3', batchId:'BATCH-003', grade:'Standard', bales:480, warehouse:'Warehouse B', location:'Section 1', status:'In Stock',  pricePerBale:1200, humidity:61 },
-  { _id:'d4', batchId:'BATCH-004', grade:'Standard', bales:390, warehouse:'Warehouse B', location:'Section 2', status:'In Stock',  pricePerBale:1200, humidity:58 },
-  { _id:'d5', batchId:'BATCH-005', grade:'Economy',  bales:120, warehouse:'Warehouse C', location:'Section 1', status:'Low Stock', pricePerBale:900,  humidity:57 },
-  { _id:'d6', batchId:'BATCH-006', grade:'Premium',  bales:950, warehouse:'Warehouse A', location:'Section 3', status:'In Stock',  pricePerBale:1480, humidity:50 },
-  { _id:'d7', batchId:'BATCH-007', grade:'Standard', bales:580, warehouse:'Warehouse C', location:'Section 2', status:'In Stock',  pricePerBale:1220, humidity:55 },
-  { _id:'d8', batchId:'BATCH-008', grade:'Economy',  bales:90,  warehouse:'Warehouse C', location:'Section 3', status:'Low Stock', pricePerBale:880,  humidity:60 },
-  { _id:'d9', batchId:'BATCH-009', grade:'Premium',  bales:760, warehouse:'Warehouse A', location:'Section 4', status:'Reserved',  pricePerBale:1460, humidity:51 },
-  { _id:'d10',batchId:'BATCH-010', grade:'Standard', bales:210, warehouse:'Warehouse B', location:'Section 3', status:'Low Stock', pricePerBale:1180, humidity:59 },
+  { _id:'d1', batchId:'BATCH-001', grade:'Premium',  bales:820, warehouse:'Warehouse A', location:'Section 1', status:'In Stock',  pricePerBale:1450, humidity:52, arrival_date: new Date(Date.now() - 10 * 86400000) },
+  { _id:'d2', batchId:'BATCH-002', grade:'Premium',  bales:650, warehouse:'Warehouse A', location:'Section 2', status:'Reserved',  pricePerBale:1450, humidity:54, arrival_date: new Date(Date.now() - 95 * 86400000) },
+  { _id:'d3', batchId:'BATCH-003', grade:'Standard', bales:480, warehouse:'Warehouse B', location:'Section 1', status:'In Stock',  pricePerBale:1200, humidity:61, arrival_date: new Date(Date.now() - 45 * 86400000) },
+  { _id:'d4', batchId:'BATCH-004', grade:'Standard', bales:390, warehouse:'Warehouse B', location:'Section 2', status:'In Stock',  pricePerBale:1200, humidity:58, arrival_date: new Date(Date.now() - 110 * 86400000) },
+  { _id:'d5', batchId:'BATCH-005', grade:'Economy',  bales:120, warehouse:'Warehouse C', location:'Section 1', status:'Low Stock', pricePerBale:900,  humidity:57, arrival_date: new Date(Date.now() - 5 * 86400000) },
+  { _id:'d6', batchId:'BATCH-006', grade:'Premium',  bales:950, warehouse:'Warehouse A', location:'Section 3', status:'In Stock',  pricePerBale:1480, humidity:50, arrival_date: new Date(Date.now() - 120 * 86400000) },
+  { _id:'d7', batchId:'BATCH-007', grade:'Standard', bales:580, warehouse:'Warehouse C', location:'Section 2', status:'In Stock',  pricePerBale:1220, humidity:55, arrival_date: new Date(Date.now() - 30 * 86400000) },
+  { _id:'d8', batchId:'BATCH-008', grade:'Economy',  bales:90,  warehouse:'Warehouse C', location:'Section 3', status:'Low Stock', pricePerBale:880,  humidity:60, arrival_date: new Date(Date.now() - 20 * 86400000) },
+  { _id:'d9', batchId:'BATCH-009', grade:'Premium',  bales:760, warehouse:'Warehouse A', location:'Section 4', status:'Reserved',  pricePerBale:1460, humidity:51, arrival_date: new Date(Date.now() - 15 * 86400000) },
+  { _id:'d10',batchId:'BATCH-010', grade:'Standard', bales:210, warehouse:'Warehouse B', location:'Section 3', status:'Low Stock', pricePerBale:1180, humidity:59, arrival_date: new Date(Date.now() - 80 * 86400000) },
 ];
 const DEMO_SHIPMENTS = [
   { _id:'s1', shipmentId:'SHIP-4501', destination:'Mumbai Textile Hub',       bales:200, status:'Delivered',  scheduledDate:'2026-03-15', carrier:'AgriFreight Ltd' },
@@ -409,24 +416,54 @@ app.delete('/api/inventory/:id', requireAuth, async (req, res) => {
   }
 });
 
+app.get('/api/inventory/aging', requireAuth, async (req, res) => {
+  try {
+    const items = isDbConnected ? await Inventory.find() : DEMO_INVENTORY;
+    const agingLots = items.map(i => {
+      const doc = isDbConnected ? i.toObject() : i;
+      const ageDays = getAgeDays(doc.arrival_date);
+      return { ...doc, age_days: ageDays };
+    }).filter(i => i.age_days > 90);
+    
+    res.json({ success: true, data: agingLots });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.get('/api/inventory/quality', requireAuth, async (req, res) => {
+  try {
+    const items = isDbConnected ? await Inventory.find() : DEMO_INVENTORY;
+    const stats = {
+      A: items.filter(i => i.grade === 'Premium').length,
+      B: items.filter(i => i.grade === 'Standard').length,
+      C: items.filter(i => i.grade === 'Economy').length
+    };
+    res.json({ success: true, data: stats });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 app.get('/api/inventory/summary', requireAuth, async (req, res) => {
   try {
-    const summary = await Inventory.aggregate([
-      { $group: {
-          _id: '$grade',
-          totalBales: { $sum: '$bales' },
-          count: { $sum: 1 },
-          avgHumidity: { $avg: '$humidity' }
-      }}
-    ]);
-    const warehouseSummary = await Inventory.aggregate([
-      { $group: {
-          _id: '$warehouse',
-          totalBales: { $sum: '$bales' },
-          count: { $sum: 1 }
-      }}
-    ]);
-    res.json({ success: true, byGrade: summary, byWarehouse: warehouseSummary });
+    const items = isDbConnected ? await Inventory.find() : DEMO_INVENTORY;
+    const total_stock = items.reduce((s, i) => s + (i.bales || 0), 0);
+    const aging_count = items.filter(i => getAgeDays(i.arrival_date) > 90).length;
+    const quality = {
+      A: items.filter(i => i.grade === 'Premium').length,
+      B: items.filter(i => i.grade === 'Standard').length,
+      C: items.filter(i => i.grade === 'Economy').length
+    };
+    // Mock forecast for the summary
+    const forecast = 455.00;
+
+    res.json({ success: true, data: {
+      total_stock,
+      aging_lots: aging_count,
+      forecast_demand: forecast,
+      quality
+    }});
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -511,11 +548,13 @@ app.get('/api/forecast', requireAuth, async (req, res) => {
         success: true,
         mlPowered: true,
         results,
+        history: actuals,
+        forecast: forecasts,
         trend,
         insights: {
-          avgConsumption:    avgValue,
+          avgActual:         avgValue,
           trend:             trend > 0 ? 'upward' : trend < 0 ? 'downward' : 'stable',
-          trendValue:        trend,
+          trendVal:          trend,
           totalProjected:    totalProjected,
           bestMonth:         bestActual.month || '—',
           bestValue:         bestActual.value || 0,
@@ -530,20 +569,36 @@ app.get('/api/forecast', requireAuth, async (req, res) => {
     console.log('⚠️  ML server unavailable, using fallback data:', mlErr.message);
     try {
       const forecasts = isDbConnected ? await Forecast.find().sort({ year:1 }) : DEMO_FORECAST;
-      const actuals = forecasts.filter(f => f.actual !== null).map(f => f.actual);
+      const actDocs = forecasts.filter(f => f.actual !== null);
+      const actuals = actDocs.map(f => f.actual);
       const avgYield = actuals.length ? Math.round(actuals.reduce((s,v)=>s+v,0)/actuals.length) : 450;
-      const nextMonths = ['Apr','May','Jun'].map(month => ({ month, year:2026, predicted:avgYield+Math.floor(Math.random()*80)-40, actual:null, isForecast:true }));
+      
+      const historyArr = actDocs.slice(-3).map(f => ({ month: `${f.month} ${f.year}`, value: f.actual, type: 'Actual' }));
+      const trendChange = actuals.length > 1 ? actuals[actuals.length - 1] - actuals[actuals.length - 2] : 0;
+      
+      const nextMonths = ['Apr','May','Jun'].map(month => {
+         return { month: `${month} 2026`, value: avgYield+Math.floor(Math.random()*80)-40, type: 'Forecast' };
+      });
+      
+      const allResults = [...historyArr, ...nextMonths];
       const best = forecasts.reduce((b,f) => (f.actual||0) > (b.actual||0) ? f : b, {});
+      
       res.json({
         success: true,
         mlPowered: false,
-        historical: forecasts,
-        upcoming: nextMonths,
+        results: allResults,
+        history: historyArr,
+        forecast: nextMonths,
+        trend: trendChange,
         insights: {
-          avgMonthlyYield: avgYield,
-          trend: actuals.length>2 ? (actuals[actuals.length-1]>actuals[actuals.length-2]?'upward':'downward') : 'stable',
-          bestMonth: best,
-          totalProjectedQ2: nextMonths.reduce((s,m)=>s+m.predicted,0)
+          avgActual: avgYield,
+          trend: trendChange > 0 ? 'upward' : trendChange < 0 ? 'downward' : 'stable',
+          trendVal: trendChange,
+          totalProjected: nextMonths.reduce((s,m)=>s+m.value,0),
+          bestMonth: best.month || '—',
+          bestValue: best.actual || 0,
+          nextMonthForecast: nextMonths[0].value,
+          modelType: 'Fallback Data'
         }
       });
     } catch (err) {
@@ -716,6 +771,12 @@ function generateAIResponse(message, ctx) {
 }
 
 // ─── Utility ──────────────────────────────────────────────────────────────────
+function getAgeDays(date) {
+  if (!date) return 0;
+  const diff = new Date() - new Date(date);
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
 function timeAgo(date) {
   const seconds = Math.floor((new Date() - new Date(date)) / 1000);
   if (seconds < 60) return `${seconds} secs ago`;
